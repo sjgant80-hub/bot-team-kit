@@ -1,0 +1,3 @@
+# Deterministic line endings everywhere — the golden rollup test compares bytes.
+* text=auto eol=lf
+*.png binary

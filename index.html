@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bot-team-kit — the nervous system for a bot-run company</title>
+<meta name="description" content="One shared feed for a team of bots overseen by a human: a redaction+flag feed writer, a deterministic daily rollup with NEEDS SIMON at the top, and a mutation gate that proves the tests catch breakage. MIT.">
+<style>
+  :root{--bg:#0e1116;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--line:#2a3240;--acc:#5aa9ff;--ok:#3fb950;--flag:#e3b341}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:860px;margin:0 auto;padding:28px 20px 80px}
+  h1{font-size:30px;margin:.2em 0 .1em;line-height:1.15}
+  h2{font-size:22px;margin:1.8em 0 .5em;border-bottom:1px solid var(--line);padding-bottom:.3em}
+  h3{font-size:17px;margin:1.3em 0 .3em}
+  .sub{color:var(--mut);font-size:17px;margin:.2em 0 1.2em}
+  a{color:var(--acc)}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:13.5px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .pill{display:inline-block;background:#10233a;color:var(--acc);border:1px solid #1d3b5e;border-radius:999px;padding:2px 10px;font-size:12.5px;margin:2px 4px 2px 0}
+  .ok{color:var(--ok);font-weight:600}
+  .flag{color:var(--flag)}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:14.5px}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);font-weight:600}
+  ol{padding-left:20px} li{margin:.3em 0}
+  .diagram{white-space:pre;font-family:ui-monospace,monospace;font-size:12.5px;color:var(--mut);line-height:1.45;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto}
+  .foot{color:var(--mut);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>bot-team-kit</h1>
+  <p class="sub">A company run by bots, overseen by a human. This is its nervous system: <b>one shared feed</b> every bot reads and writes, a writer that <b>redacts secrets</b> and <b>flags unproven claims</b>, a deterministic <b>daily rollup</b> with <span class="flag">NEEDS&nbsp;SIMON</span> at the top, and a <b>mutation gate</b> that proves the tests actually catch breakage.</p>
+  <p>
+    <span class="pill">MIT</span>
+    <span class="pill">node, zero deps</span>
+    <span class="pill ok">11 tests pass</span>
+    <span class="pill ok">9/9 mutants killed</span>
+    <a class="pill" href="https://github.com/sjgant80-hub/bot-team-kit">source ↗</a>
+  </p>
+
+  <h2>1 · What it is, in plain words</h2>
+  <div class="card">
+    A small team of AI bots can only be trusted if their work is <b>checked</b>, not just produced. This kit gives the team the one thing that makes checking possible: a <b>single shared log of every action</b>, written in a way that can't leak a secret and can't quietly claim "done" without a proof. A separate auditor bot and a human (Simon) read that log; anything public, paid, or risky stops and waits for the human's signature.
+  </div>
+
+  <h2>2 · Start here — use it in 30 seconds</h2>
+  <pre>git clone https://github.com/sjgant80-hub/bot-team-kit
+cd bot-team-kit
+
+# a bot records an action (secrets are stripped, unproven "done" is flagged)
+node src/feed.mjs --agent BUILDER --kind build \
+  --what "feed writer gated, 9/9 mutants killed" \
+  --receipt 9b15d4ff54fb189cf942fae1528037d3bcb496d5ca84c1bbe6af840e98dd57c5
+
+# build the morning brief Simon reads
+node src/rollup.mjs --out AGENT_FEED.md
+
+# prove it yourself
+node --test test/test.mjs   &&  node gate.mjs</pre>
+
+  <h2>3 · How it works — traced from a real run</h2>
+  <div class="diagram">  a bot acts
+      │
+      ▼
+  ┌─────────────────────────────────────────────┐
+  │ feed.mjs append()                            │
+  │   1. stamp ts                                │
+  │   2. REDACT every string  ──► keys, tokens,  │
+  │                                emails, cards  │
+  │                                → [REDACTED:…] │
+  │   3. FLAG  "done" with no receipt/link        │
+  │              → flags:["done-without-receipt"]│
+  │   4. VALIDATE against schema.json             │
+  └───────────────┬───────────────────────────────┘
+                  ▼
+      .estate/feed.jsonl   (master on the box;
+                            estate-continuity mirrors it)
+                  │
+                  ▼
+  ┌─────────────────────────────────────────────┐
+  │ rollup.mjs → AGENT_FEED.md                    │
+  │   ## NEEDS SIMON   ← decisions, listings,     │
+  │                      posts, blockers, FLAGS   │
+  │   ## &lt;persona&gt;      ← newest first, grouped    │
+  └─────────────────────────────────────────────┘</div>
+  <p>Real line, as written to the feed (note the redaction and the flag):</p>
+  <pre>in:  {"agent":"REACH","kind":"post","what":"draft ready, token=ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA done"}
+out: {"ts":"…","agent":"REACH","kind":"post","what":"draft ready, token=[REDACTED:gh-token] done",
+      "flags":["done-without-receipt"]}</pre>
+
+  <h2>4 · The blueprint — organ by organ</h2>
+  <table>
+    <tr><th>organ</th><th>job</th></tr>
+    <tr><td><code>src/kernel.mjs</code></td><td>pure, total functions — <code>redact</code>, <code>flagsFor</code>, <code>validateLine</code>, <code>rollup</code>. Never throws on garbage. This is the gated surface.</td></tr>
+    <tr><td><code>src/feed.mjs</code></td><td>append one redacted + flagged + valid JSON line to the feed (CLI + library).</td></tr>
+    <tr><td><code>src/rollup.mjs</code></td><td>read the feed → write the morning rollup, NEEDS SIMON first.</td></tr>
+    <tr><td><code>schema.json</code></td><td>the contract for a feed line.</td></tr>
+    <tr><td><code>gate.mjs</code></td><td>breaks the kernel 9 ways and proves every break is caught. A survivor turns the gate red.</td></tr>
+    <tr><td><code>test/</code></td><td>1000-line redaction fuzz (0 leaks), both flag branches, golden rollup determinism.</td></tr>
+    <tr><td><code>skills/feed-write/</code></td><td>the first reusable team skill, multi-runtime frontmatter.</td></tr>
+  </table>
+
+  <h2>5 · The roster &amp; the rules</h2>
+  <div class="grid">
+    <div class="card"><b>KAR</b> — conductor. Reads the feed, assigns, writes the rollup. Never ships or spends.</div>
+    <div class="card"><b>BUILDER</b> — builds against the gate, seals claims. Never merges or releases without the auditor + Simon.</div>
+    <div class="card"><b>AUDITOR</b> — separate judge. Claims vs receipts, re-runs tests. Never builds.</div>
+    <div class="card"><b>MONEY&nbsp;TIME · REACH · SCOUT · CLIENT&nbsp;LEAD · CARD&nbsp;KEEPER</b> — sell, post, watch, intake, sign. Each stays in its lane.</div>
+  </div>
+  <p>Ten rules govern the team (one role per bot · seal "done" first · every claim links a re-runnable receipt · allowed tools only · the auditor checks everything before it moves · <span class="flag">NEEDS SIMON</span> for anything public/paid/risky · plain language · no earnings or crypto claims · follow platform rules · failures stay on record).</p>
+
+  <h2>6 · For your team</h2>
+  <div class="card">
+    If you run more than one AI agent, you already have the problem this solves: who did what, was it true, and did anything leak. Point every agent at one <code>feed.mjs</code>, read the rollup each morning, and let a separate auditor re-run the receipts. It's one file to adopt, MIT, zero dependencies, and every claim it makes about itself is one command away from proof.
+  </div>
+
+  <div class="foot">
+    AI Native Solutions. Checking is automated and separate; anything public, paid or risky waits for the human. Built and gated by Kar; overseen by Simon.
+  </div>
+</div>
+</body>
+</html>

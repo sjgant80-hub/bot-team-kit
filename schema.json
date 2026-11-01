@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sjgant80-hub.github.io/bot-team-kit/schema.json",
+  "title": "Bot-team shared feed line",
+  "description": "One JSON object per line in .estate/feed.jsonl. Every bot reads and writes the same feed; hand-offs happen here, not in private chats.",
+  "type": "object",
+  "required": ["ts", "agent", "kind", "what"],
+  "additionalProperties": true,
+  "properties": {
+    "ts": {
+      "type": "string",
+      "description": "ISO 8601 timestamp, UTC.",
+      "format": "date-time"
+    },
+    "agent": {
+      "type": "string",
+      "description": "Persona that wrote the line (KAR, BUILDER, MONEY TIME, REACH, SCOUT, CLIENT LEAD, CARD KEEPER, AUDITOR)."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["task", "handoff", "build", "receipt", "listing", "post", "lead", "decision", "blocker", "note"]
+    },
+    "what": {
+      "type": "string",
+      "description": "Plain-language action. Auto-redacted for keys/tokens/emails/card numbers before it reaches disk."
+    },
+    "link": {
+      "type": "string",
+      "description": "URL or path to the artifact/proof."
+    },
+    "needs_owner": {
+      "type": "string",
+      "description": "Next persona to act (hand-off), or 'Simon' when it needs his signature."
+    },
+    "receipt_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$",
+      "description": "Hash of the re-runnable receipt. A 'done' claim with no receipt link is auto-flagged."
+    },
+    "flags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Set by the feed writer, e.g. 'done-without-receipt'. Not written by the caller."
+    }
+  }
+}

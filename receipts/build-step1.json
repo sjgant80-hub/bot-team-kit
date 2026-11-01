@@ -1,0 +1,23 @@
+{
+  "build": "bot-team-kit step-1 (feed + rules)",
+  "ran": [
+    "node --test test/test.mjs",
+    "node gate.mjs"
+  ],
+  "results": {
+    "tests": "11 passed / 0 failed",
+    "mutation_gate": "9/9 mutants killed, GREEN"
+  },
+  "reproduce": "npm ci-free: node --test test/test.mjs && node gate.mjs",
+  "sources": {
+    "src/kernel.mjs": "224534fe551b1d0b3e80a651fdbedbc6f87758430b0a123dc29faf5d440a41a7",
+    "src/feed.mjs": "2354d0e2cff57cff99c3e496c0761fafc35a431c353808f6990ddb384342c3f9",
+    "src/rollup.mjs": "da941f32596d164ba426c20933cc08d47d1532ddd76591a97517186fd5cfbc3b",
+    "schema.json": "7d573796473a5502816789e689d896a9327932d981383113bc824d66e9e5fe8f",
+    "test/checks.mjs": "58ba930370fa80f72fdeb11717b12c5b09a5016f3a367c11a0be478b570df928",
+    "test/test.mjs": "61af4873b483e11483fb1ac615954fb9ba2203576ee974dc29919c6240f6719c",
+    "test/golden/rollup.md": "eade6c47c52507a037ed9d1df3e08dd0cfee60474a24330303c00c6aa70c82f3",
+    "gate.mjs": "21bc5d7f82c7fabc04e120069ecb3b46b22e7422a9c0e762845aff592fc66b0f"
+  },
+  "anchor": "9b15d4ff54fb189cf942fae1528037d3bcb496d5ca84c1bbe6af840e98dd57c5"
+}

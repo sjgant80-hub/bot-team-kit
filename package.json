@@ -1,0 +1,18 @@
+{
+  "name": "bot-team-kit",
+  "version": "0.1.0",
+  "description": "Shared-feed toolkit for a bot team overseen by a human: append/redact/flag feed writer, persona rollup, schema, tested + mutation-gated.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "bot-feed": "src/feed.mjs",
+    "bot-rollup": "src/rollup.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/test.mjs",
+    "gate": "node gate.mjs",
+    "gen-golden": "node test/gen-golden.mjs",
+    "check": "npm test && npm run gate"
+  },
+  "engines": { "node": ">=18" }
+}

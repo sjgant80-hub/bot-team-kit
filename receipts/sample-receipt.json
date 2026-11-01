@@ -1,0 +1,12 @@
+{
+  "_comment": "A receipt is the re-runnable proof behind a feed claim. A bot posts receipt_sha256 = sha256 of this file to the feed; the AUDITOR re-runs `reproduce` and recomputes `anchor` to confirm the claim. This is the shape every persona's skill must emit.",
+  "build": "example-skill vX.Y",
+  "claim": "the parser handles RFC-4180 quoting; 48/48 cases pass",
+  "ran": ["node --test test/parser.test.mjs"],
+  "results": { "tests": "48 passed / 0 failed" },
+  "reproduce": "git checkout <sha> && node --test test/parser.test.mjs",
+  "sources": {
+    "src/parser.mjs": "<sha256 of the gated source file>"
+  },
+  "anchor": "<sha256 of this object with the anchor field removed>"
+}

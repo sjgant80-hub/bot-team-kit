@@ -1,0 +1,220 @@
+{
+  "receipt": "bot-team-kit step 1b — CLAIMS-1b L, F and R claims, measured once",
+  "sealedIn": "CLAIMS-1b.md",
+  "sealCommit": "b173d003fcc4b6c49ebef92de72cfaa0dc618849",
+  "sealSha256": "949edb2842ba2c563247540b504c1c75578a58dd75a4df858430fae5560e9322",
+  "probe": {
+    "file": "data/probe-1b.json",
+    "sha256": "d7bf3efd7728e953f65254dc48a5332fffc2b6dcce1e07ca572a774f23a9ce7f"
+  },
+  "step1": {
+    "commit": "4c20fd942289916e2a75dd443b83d32c13805c62",
+    "sha256": {
+      "src/kernel.mjs": "224534fe551b1d0b3e80a651fdbedbc6f87758430b0a123dc29faf5d440a41a7",
+      "src/feed.mjs": "2354d0e2cff57cff99c3e496c0761fafc35a431c353808f6990ddb384342c3f9",
+      "src/rollup.mjs": "da941f32596d164ba426c20933cc08d47d1532ddd76591a97517186fd5cfbc3b",
+      "test/checks.mjs": "58ba930370fa80f72fdeb11717b12c5b09a5016f3a367c11a0be478b570df928"
+    }
+  },
+  "now": {
+    "sha256": {
+      "src/kernel.mjs": "0551256cf813718698718b6c03e0c32fb7a95d9b2b8c0b6ebfbc3223065d39a7",
+      "src/feed.mjs": "b1107fd1f4d7f2a8346ab7c7aee51cab315d9b6b3b107368f79f94b3714d86e6",
+      "src/rollup.mjs": "817a4666e620b127cacef27223a3e1d1c401585d5eb366e6d8d80f4a2d9d6e5f"
+    }
+  },
+  "reproduce": "node tools/measure.mjs --check",
+  "claims": [
+    {
+      "id": "L1",
+      "bar": "recorded only",
+      "held": null,
+      "measured": {
+        "step1": {
+          "items": 36,
+          "leaked": 19,
+          "leakedIds": [
+            "L02",
+            "L03",
+            "L04",
+            "L08",
+            "L09",
+            "L10",
+            "L11",
+            "L13",
+            "L16",
+            "L17",
+            "L20",
+            "L21",
+            "L27",
+            "L28",
+            "L31",
+            "L32",
+            "L33",
+            "L35",
+            "L36"
+          ]
+        }
+      }
+    },
+    {
+      "id": "L2",
+      "bar": "0 of 36 leak",
+      "held": true,
+      "measured": {
+        "now": {
+          "items": 36,
+          "leaked": 0,
+          "leakedIds": []
+        }
+      }
+    },
+    {
+      "id": "L3",
+      "bar": "16 of 16 unchanged",
+      "held": true,
+      "measured": {
+        "step1": {
+          "items": 16,
+          "unchanged": 15,
+          "changedIds": [
+            "C04"
+          ]
+        },
+        "now": {
+          "items": 16,
+          "unchanged": 16,
+          "changedIds": []
+        }
+      }
+    },
+    {
+      "id": "L4",
+      "bar": "0 leaks",
+      "held": true,
+      "measured": {
+        "now": {
+          "lines": 1000,
+          "leaks": 0,
+          "passed": true
+        }
+      }
+    },
+    {
+      "id": "F1",
+      "bar": "20 of 20 flagged",
+      "held": true,
+      "measured": {
+        "step1": {
+          "items": 20,
+          "flagged": 6,
+          "missedIds": [
+            "F03",
+            "F04",
+            "F05",
+            "F06",
+            "F07",
+            "F08",
+            "F09",
+            "F10",
+            "F11",
+            "F12",
+            "F13",
+            "F17",
+            "F18",
+            "F19"
+          ]
+        },
+        "now": {
+          "items": 20,
+          "flagged": 20,
+          "missedIds": []
+        }
+      }
+    },
+    {
+      "id": "F2",
+      "bar": "0 of 10 flagged",
+      "held": true,
+      "measured": {
+        "step1": {
+          "items": 10,
+          "flagged": 0,
+          "flaggedIds": []
+        },
+        "now": {
+          "items": 10,
+          "flagged": 0,
+          "flaggedIds": []
+        }
+      }
+    },
+    {
+      "id": "F3",
+      "bar": "7 of 7 as stated",
+      "held": true,
+      "measured": {
+        "step1": {
+          "items": 7,
+          "asStated": 4,
+          "wrongIds": [
+            "P04",
+            "P05",
+            "P07"
+          ]
+        },
+        "now": {
+          "items": 7,
+          "asStated": 7,
+          "wrongIds": []
+        }
+      }
+    },
+    {
+      "id": "R1",
+      "bar": "every structural check holds",
+      "held": true,
+      "measured": {
+        "step1": {
+          "lines": 7,
+          "checks": 7,
+          "held": false,
+          "failedChecks": [
+            "onlyKnownLineShapes",
+            "oneTitle",
+            "needsSimonOnceAndFirst",
+            "headingsArePersonas",
+            "itemsAreLines",
+            "secretAbsent"
+          ]
+        },
+        "now": {
+          "lines": 7,
+          "checks": 7,
+          "held": true,
+          "failedChecks": []
+        }
+      }
+    },
+    {
+      "id": "R2",
+      "bar": "NEEDS SIMON names the unreadable count",
+      "held": true,
+      "measured": {
+        "step1": {
+          "unreadable": 2,
+          "toldSimon": false
+        },
+        "now": {
+          "unreadable": 2,
+          "toldSimon": true
+        }
+      }
+    }
+  ],
+  "summary": {
+    "held": 8,
+    "failed": 0,
+    "recorded": 1
+  }
+}

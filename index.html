@@ -3,125 +3,363 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>bot-team-kit — the nervous system for a bot-run company</title>
-<meta name="description" content="One shared feed for a team of bots overseen by a human: a redaction+flag feed writer, a deterministic daily rollup with NEEDS SIMON at the top, and a mutation gate that proves the tests catch breakage. MIT.">
+<link rel="icon" href="data:,">
+<title>bot-team-kit — one shared feed for a team of bots</title>
+<meta name="description" content="One shared feed for a team of AI bots overseen by a person: a writer that redacts secrets and flags unproven claims before anything reaches disk, and a morning rollup with NEEDS SIMON at the top. Every claim about it is a receipt GitHub's runner re-derives. MIT.">
 <style>
-  :root{--bg:#0e1116;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--line:#2a3240;--acc:#5aa9ff;--ok:#3fb950;--flag:#e3b341}
+  :root{--bg:#0e1116;--panel:#161b22;--ink:#e6edf3;--mut:#9aa7b4;--line:#2a3240;--acc:#5aa9ff;--ok:#3fb950;--flag:#e3b341;--bad:#f0716a;--soft:#10233a;--softline:#1d3b5e}
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:860px;margin:0 auto;padding:28px 20px 80px}
+  .wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}
   h1{font-size:30px;margin:.2em 0 .1em;line-height:1.15}
-  h2{font-size:22px;margin:1.8em 0 .5em;border-bottom:1px solid var(--line);padding-bottom:.3em}
-  h3{font-size:17px;margin:1.3em 0 .3em}
+  h2{font-size:22px;margin:2em 0 .5em;border-bottom:1px solid var(--line);padding-bottom:.3em;scroll-margin-top:64px}
+  h3{font-size:17px;margin:1.4em 0 .35em}
   .sub{color:var(--mut);font-size:17px;margin:.2em 0 1.2em}
   a{color:var(--acc)}
   code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:13.5px}
+  code{font-size:.92em;overflow-wrap:anywhere}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;font-size:13.5px;margin:10px 0}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-  .pill{display:inline-block;background:#10233a;color:var(--acc);border:1px solid #1d3b5e;border-radius:999px;padding:2px 10px;font-size:12.5px;margin:2px 4px 2px 0}
+  .grid .card{margin:0}
+  .pill{display:inline-block;background:var(--soft);color:var(--acc);border:1px solid var(--softline);border-radius:999px;padding:2px 10px;font-size:12.5px;margin:2px 4px 2px 0;text-decoration:none}
   .ok{color:var(--ok);font-weight:600}
   .flag{color:var(--flag)}
+  .bad{color:var(--bad);font-weight:600}
+  .mut{color:var(--mut)}
   table{width:100%;border-collapse:collapse;margin:8px 0;font-size:14.5px}
   th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   th{color:var(--mut);font-weight:600}
-  ol{padding-left:20px} li{margin:.3em 0}
-  .diagram{white-space:pre;font-family:ui-monospace,monospace;font-size:12.5px;color:var(--mut);line-height:1.45;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto}
+  td.num,th.num{text-align:right;white-space:nowrap}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  ol{padding-left:22px} li{margin:.35em 0}
   .foot{color:var(--mut);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+  nav.toc{position:sticky;top:0;z-index:5;background:rgba(14,17,22,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);margin:0 -20px;padding:8px 20px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap}
+  nav.toc a{color:var(--mut);text-decoration:none;font-size:13.5px;padding:3px 8px;border-radius:6px}
+  nav.toc a:hover,nav.toc a:focus{color:var(--ink);background:var(--panel)}
+  .lede{font-size:18px;margin:.4em 0}
+  .status{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0 4px}
+  .status .pill b{color:var(--ink)}
+  /* the try-it panel */
+  .try{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .try label{display:block;font-size:13.5px;color:var(--mut);margin:0 0 8px}
+  .try input,.try select,.try textarea,.costin input{width:100%;margin-top:3px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:15px}
+  .try textarea{min-height:76px;resize:vertical}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+  button{background:var(--soft);color:var(--ink);border:1px solid var(--softline);border-radius:8px;padding:8px 12px;font:inherit;font-size:14.5px;cursor:pointer}
+  button:hover,button:focus{border-color:var(--acc)}
+  button.go{background:#1a3d24;border-color:#2c6b3c}
+  .verdict{font-size:14.5px;margin:6px 0}
+  .out{margin:0;min-height:60px;white-space:pre-wrap;overflow-wrap:anywhere}
+  /* the diagram */
+  figure{margin:14px 0}
+  figure svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+  figcaption{color:var(--mut);font-size:13.5px;text-align:center;margin-top:6px}
+  svg .box{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+  svg .box.io{stroke:var(--acc)}
+  svg .box.stop{stroke:var(--bad)}
+  svg .box.top{stroke:var(--flag)}
+  svg .t{fill:var(--ink);font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  svg .s{fill:var(--mut);font:11.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  svg .arrow{stroke:var(--mut);stroke-width:1.4;fill:none;marker-end:url(#tip)}
+  svg .arrow.no{stroke:var(--bad);stroke-dasharray:4 3;marker-end:url(#tipbad)}
+  svg #tip path{fill:var(--mut)} svg #tipbad path{fill:var(--bad)}
+  .trace td{font-size:13.5px}
+  .trace td code{font-size:12.5px}
+  /* the brochure */
+  .roles .card b{display:block;margin-bottom:4px}
+  .costin{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px 14px;margin:10px 0}
+  .costin label{font-size:13.5px;color:var(--mut)}
+  .costin small{display:block;font-size:12px;color:var(--mut)}
+  .costhead{font-size:16.5px;margin:12px 0 6px}
+  .win{color:var(--ok)}
+  tr.own td{background:rgba(63,185,80,.07)}
+  dl.risks dt{font-weight:600;margin-top:12px}
+  dl.risks dd{margin:4px 0 0 0;color:var(--ink)}
+  .board{border-color:var(--flag)}
+  .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .cta a{display:inline-block;background:var(--soft);border:1px solid var(--softline);border-radius:8px;padding:8px 14px;text-decoration:none}
+  .paper p{margin:.6em 0}
+  @media (max-width:640px){
+    .wrap{padding:20px 16px 64px}
+    nav.toc{margin:0 -16px;padding:8px 16px}
+    h1{font-size:26px}
+    .try{grid-template-columns:1fr}
+    th,td{padding:6px 5px}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <h1>bot-team-kit</h1>
-  <p class="sub">A company run by bots, overseen by a human. This is its nervous system: <b>one shared feed</b> every bot reads and writes, a writer that <b>redacts secrets</b> and <b>flags unproven claims</b>, a deterministic <b>daily rollup</b> with <span class="flag">NEEDS&nbsp;SIMON</span> at the top, and a <b>mutation gate</b> that proves the tests actually catch breakage.</p>
-  <p>
+  <p class="sub">One shared feed for a team of AI bots that a person oversees. Every bot writes what it did to the same file; secrets are stripped out and unproven "done" claims are flagged <i>before</i> anything is saved; and each morning one page — with <span class="flag">NEEDS&nbsp;SIMON</span> at the top — says what the bots did and what is waiting for a person.</p>
+  <div class="status" aria-label="live status, read from the receipts">
     <span class="pill">MIT</span>
-    <span class="pill">node, zero deps</span>
-    <span class="pill ok">11 tests pass</span>
-    <span class="pill ok">9/9 mutants killed</span>
+    <span class="pill">Node.js, no dependencies</span>
+    <span class="pill">tests <b><span data-r="testsPassed"></span>/<span data-r="testsTotal"></span></b> pass</span>
+    <span class="pill">witness <span data-r="witnessTag"></span>: <b><span data-r="organKilled"></span>/<span data-r="organMutants"></span></b> mutants killed, <span data-r="allClean"></span></span>
+    <span class="pill">sealed claims: <b><span data-r="claimsHeld"></span></b> held, <b><span data-r="claimsFailed"></span></b> failed</span>
     <a class="pill" href="https://github.com/sjgant80-hub/bot-team-kit">source ↗</a>
-  </p>
-
-  <h2>1 · What it is, in plain words</h2>
-  <div class="card">
-    A small team of AI bots can only be trusted if their work is <b>checked</b>, not just produced. This kit gives the team the one thing that makes checking possible: a <b>single shared log of every action</b>, written in a way that can't leak a secret and can't quietly claim "done" without a proof. A separate auditor bot and a human (Simon) read that log; anything public, paid, or risky stops and waits for the human's signature.
   </div>
 
-  <h2>2 · Start here — use it in 30 seconds</h2>
-  <pre>git clone https://github.com/sjgant80-hub/bot-team-kit
-cd bot-team-kit
+  <nav class="toc" aria-label="sections">
+    <a href="#what">What it is</a><a href="#start">Start here</a><a href="#how">How it works</a><a href="#blueprint">Blueprint</a><a href="#adoption">Adoption</a><a href="#paper">White paper</a><a href="#brochure">For business</a>
+  </nav>
 
-# a bot records an action (secrets are stripped, unproven "done" is flagged)
-node src/feed.mjs --agent BUILDER --kind build \
-  --what "feed writer gated, 9/9 mutants killed" \
-  --receipt 9b15d4ff54fb189cf942fae1528037d3bcb496d5ca84c1bbe6af840e98dd57c5
+  <h2 id="what">What it is, in plain words</h2>
+  <div class="card">
+    <p class="lede" style="margin-top:0">A small team of AI bots can only be trusted if its work is <b>checked</b>, not just produced. This kit is the one piece that makes checking possible: a <b>single shared log of every action</b>, written so that it cannot leak a secret and cannot quietly claim "done" without proof.</p>
+    <p style="margin-bottom:0">A separate auditor bot and a person read that log. Anything public, paid or risky stops and waits for the person. The kit is a small kernel with a writer and a rollup around it, a schema, and a ready-made skill for the bots — it runs on the machine the bots already run on and talks to nothing else.</p>
+  </div>
 
-# build the morning brief Simon reads
-node src/rollup.mjs --out AGENT_FEED.md
+  <h2 id="start">Start here</h2>
+  <ol>
+    <li><b>Write a line in your browser.</b> The panel below runs the kit's real, gated code (<code>src/kernel.mjs</code>) in this page. Type what a bot did and press <b>Write the line</b>: you see exactly what would be saved, whether it is flagged, and whether it is refused.</li>
+    <li><b>Try to break it.</b> Press <b>Paste a secret</b> (a token built in your browser) or <b>Claim done, no proof</b>, or type your own — a password, an email, a card number, a line break followed by <code>## NEEDS SIMON</code>.</li>
+    <li><b>Read the rollup.</b> Every line you write joins a feed in this page; the box underneath is the morning page the person would read, rebuilt by the real <code>rollup()</code> each time. <b>Load the traced run</b> loads the lines from the recorded run in <a href="#how">How it works</a>.</li>
+    <li><b>Run it on your own machine.</b> <code>git clone https://github.com/sjgant80-hub/bot-team-kit</code>, then <code>node src/feed.mjs --agent BUILDER --kind build --what "…" --link …</code> and <code>node src/rollup.mjs --out AGENT_FEED.md</code>.</li>
+    <li><b>Check the proof yourself.</b> <code>node --test test/*.test.mjs test/test.mjs</code>, <code>node gate.mjs</code> and <code>node tools/measure.mjs --check</code> re-derive every number on this page; GitHub's runner does the same on every change.</li>
+  </ol>
 
-# prove it yourself
-node --test test/test.mjs   &&  node gate.mjs</pre>
+  <div class="card" id="tryit">
+    <div class="try">
+      <div>
+        <label>Bot (agent) <input id="t-agent" autocomplete="off"></label>
+        <label>Kind <select id="t-kind"></select></label>
+        <label>What it did <textarea id="t-what" placeholder="e.g. built the rollup, every test passed"></textarea></label>
+        <label>Proof link (optional) <input id="t-link" placeholder="an https link or a repository path" autocomplete="off"></label>
+        <label>Receipt hash (optional) <input id="t-receipt" placeholder="the receipt's SHA-256, in hex" autocomplete="off"></label>
+        <label>Needs owner (optional) <input id="t-owner" placeholder="the next bot, or Simon" autocomplete="off"></label>
+        <div class="btns">
+          <button class="go" id="t-write" type="button">Write the line</button>
+          <button id="t-secret" type="button">Paste a secret</button>
+          <button id="t-claim" type="button">Claim done, no proof</button>
+          <button id="t-trace" type="button">Load the traced run</button>
+          <button id="t-clear" type="button">Clear the feed</button>
+        </div>
+      </div>
+      <div>
+        <div class="mut" style="font-size:13.5px">What the writer would save</div>
+        <p class="verdict" id="t-verdict" aria-live="polite">Nothing written yet.</p>
+        <pre class="out" id="t-line"></pre>
+        <div class="mut" style="font-size:13.5px;margin-top:10px">The morning rollup, from this page's feed</div>
+        <pre class="out" id="t-rollup"></pre>
+      </div>
+    </div>
+  </div>
 
-  <h2>3 · How it works — traced from a real run</h2>
-  <div class="diagram">  a bot acts
-      │
-      ▼
-  ┌─────────────────────────────────────────────┐
-  │ feed.mjs append()                            │
-  │   1. stamp ts                                │
-  │   2. REDACT every string  ──► keys, tokens,  │
-  │                                emails, cards  │
-  │                                → [REDACTED:…] │
-  │   3. FLAG  "done" with no receipt/link        │
-  │              → flags:["done-without-receipt"]│
-  │   4. VALIDATE against schema.json             │
-  └───────────────┬───────────────────────────────┘
-                  ▼
-      .estate/feed.jsonl   (master on the box;
-                            estate-continuity mirrors it)
-                  │
-                  ▼
-  ┌─────────────────────────────────────────────┐
-  │ rollup.mjs → AGENT_FEED.md                    │
-  │   ## NEEDS SIMON   ← decisions, listings,     │
-  │                      posts, blockers, FLAGS   │
-  │   ## &lt;persona&gt;      ← newest first, grouped    │
-  └─────────────────────────────────────────────┘</div>
-  <p>Real line, as written to the feed (note the redaction and the flag):</p>
-  <pre>in:  {"agent":"REACH","kind":"post","what":"draft ready, token=ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA done"}
-out: {"ts":"…","agent":"REACH","kind":"post","what":"draft ready, token=[REDACTED:gh-token] done",
-      "flags":["done-without-receipt"]}</pre>
+  <h2 id="how">How it works</h2>
+  <p>Two moves: <b>write</b> (one call per action, in <code>src/feed.mjs</code>) and <b>roll up</b> (once a morning, in <code>src/rollup.mjs</code>). Both are thin wrappers; every decision is made by the pure functions in <code>src/kernel.mjs</code>, which is what the gates test. The diagram follows the code, in the order it runs.</p>
+  <figure>
+    <svg viewBox="0 0 360 680" role="img" aria-labelledby="flowtitle flowdesc">
+      <title id="flowtitle">The flow of one line through the kit</title>
+      <desc id="flowdesc">A bot hands the writer a line; the time is stamped; every string is redacted; a claim with no proof is flagged; the schema is checked and a failing line is refused; a passing line is appended to the feed; the rollup reads the feed, counts unreadable lines, prints every field on one line redacted again, puts NEEDS SIMON first and then each bot newest first; the person decides and the auditor re-runs receipts.</desc>
+      <defs>
+        <marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="tipbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <rect class="box io" x="20" y="8" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="29">A bot hands the writer a line</text>
+      <text class="s" x="34" y="47">append(input) · src/feed.mjs</text>
+      <path class="arrow" d="M180 58 V72"/>
+      <rect class="box" x="20" y="74" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="95">Stamp the time</text>
+      <text class="s" x="34" y="113">the caller's ts, else the clock</text>
+      <path class="arrow" d="M180 124 V138"/>
+      <rect class="box" x="20" y="140" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="161">Redact every string, at any depth</text>
+      <text class="s" x="34" y="179">redactLine() · keys, tokens, cards…</text>
+      <path class="arrow" d="M180 190 V204"/>
+      <rect class="box" x="20" y="206" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="227">Flag a claim with no proof</text>
+      <text class="s" x="34" y="245">flagsFor() · claimsDone + isProof</text>
+      <path class="arrow" d="M120 256 V270"/>
+      <rect class="box" x="20" y="272" width="200" height="50" rx="9"/>
+      <text class="t" x="34" y="293">Check the schema</text>
+      <text class="s" x="34" y="311">validateLine()</text>
+      <path class="arrow no" d="M220 297 H244"/>
+      <rect class="box stop" x="246" y="272" width="94" height="50" rx="9"/>
+      <text class="t" x="256" y="293">Refused</text>
+      <text class="s" x="256" y="311">not written</text>
+      <path class="arrow" d="M120 322 V336"/>
+      <rect class="box io" x="20" y="338" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="359">Append one JSON line</text>
+      <text class="s" x="34" y="377">feed.jsonl · one line per action</text>
+      <path class="arrow" d="M180 388 V402"/>
+      <rect class="box" x="20" y="404" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="425">Read the feed</text>
+      <text class="s" x="34" y="443">readFeedReport() · counts bad lines</text>
+      <path class="arrow" d="M180 454 V468"/>
+      <rect class="box" x="20" y="470" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="491">Roll up: one line per field</text>
+      <text class="s" x="34" y="509">rollup() · printed() redacts again</text>
+      <path class="arrow" d="M180 520 V534"/>
+      <rect class="box top" x="20" y="536" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="557">AGENT_FEED.md</text>
+      <text class="s" x="34" y="575">NEEDS SIMON first, then each bot</text>
+      <path class="arrow" d="M180 586 V600"/>
+      <rect class="box io" x="20" y="602" width="320" height="50" rx="9"/>
+      <text class="t" x="34" y="623">The person decides</text>
+      <text class="s" x="34" y="641">the auditor re-runs the receipts</text>
+    </svg>
+    <figcaption>The real call order in <code>src/feed.mjs</code> → <code>src/kernel.mjs</code> → <code>src/rollup.mjs</code>.</figcaption>
+  </figure>
 
-  <h2>4 · The blueprint — organ by organ</h2>
-  <table>
-    <tr><th>organ</th><th>job</th></tr>
-    <tr><td><code>src/kernel.mjs</code></td><td>pure, total functions — <code>redact</code>, <code>flagsFor</code>, <code>validateLine</code>, <code>rollup</code>. Never throws on garbage. This is the gated surface.</td></tr>
-    <tr><td><code>src/feed.mjs</code></td><td>append one redacted + flagged + valid JSON line to the feed (CLI + library).</td></tr>
-    <tr><td><code>src/rollup.mjs</code></td><td>read the feed → write the morning rollup, NEEDS SIMON first.</td></tr>
-    <tr><td><code>schema.json</code></td><td>the contract for a feed line.</td></tr>
-    <tr><td><code>gate.mjs</code></td><td>breaks the kernel 9 ways and proves every break is caught. A survivor turns the gate red.</td></tr>
-    <tr><td><code>test/</code></td><td>1000-line redaction fuzz (0 leaks), both flag branches, golden rollup determinism.</td></tr>
-    <tr><td><code>skills/feed-write/</code></td><td>the first reusable team skill, multi-runtime frontmatter.</td></tr>
-  </table>
+  <h3>Traced from a real run</h3>
+  <p>This is not a drawing. <code>tools/trace.mjs</code> sent <span data-r="traceLines"></span> lines from <span data-r="traceBots"></span> bots through the real <code>append()</code> with a fixed clock, then the real <code>buildRollup()</code>; the result is committed as <a href="receipts/trace.json"><code>receipts/trace.json</code></a> and CI re-derives it byte for byte on every change. Of those lines, <span data-r="traceStored"></span> were stored, <span data-r="traceRedacted"></span> had a field redacted, <span data-r="traceFlagged"></span> was flagged as a claim with no proof, and <span data-r="traceForSimon"></span> reached NEEDS SIMON.</p>
+  <div class="scroll"><table class="trace" id="trace-table"><thead><tr><th>Bot</th><th>What it handed in</th><th>What was saved</th><th>Flag</th></tr></thead><tbody></tbody></table></div>
+  <p class="mut" style="font-size:14px;margin-bottom:4px">The rollup that run produced, exactly as written:</p>
+  <pre id="trace-rollup"></pre>
 
-  <h2>5 · The roster &amp; the rules</h2>
+  <h2 id="blueprint">The blueprint — organ by organ</h2>
+  <p>Each organ, what it does, the tests that hold it, and what <a href="https://github.com/sjgant80-hub/witness">witness</a> <span data-r="witnessTag"></span> found when it broke the organ on purpose — every comparison and logic operator flipped, one at a time, with the tests run against each broken copy. A broken copy the tests still pass is a hole; none survived. Read from <a href="receipts/witness.json"><code>receipts/witness.json</code></a>, which CI rebuilds from its own witness run.</p>
+  <div class="scroll"><table id="organ-table"><thead><tr><th>Organ</th><th>What it does</th><th>Held by</th><th class="num">Mutants killed</th></tr></thead><tbody></tbody></table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Around the organs</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>schema.json</code></td><td>The contract for one feed line: <code>ts</code>, <code>agent</code>, <code>kind</code>, <code>what</code>, and the optional <code>link</code>, <code>receipt_sha256</code>, <code>needs_owner</code>; the writer sets <code>flags</code>.</td></tr>
+      <tr><td><code>gate.mjs</code></td><td>The kit's own curated mutation gate: named, deliberate breaks of the kernel (no nested redaction, any link counts as proof, line breaks pass through…), each of which the checks must catch. <span data-r="curatedKilled"></span> of <span data-r="curatedListed"></span> caught. Its list may grow, never shrink.</td></tr>
+      <tr><td><code>skills/feed-write/SKILL.md</code></td><td>The skill a bot loads to write the feed (Claude Code, Codex, Grok). It is pinned to the kernel's SHA-256: change the kernel and a test fails until the skill is re-read and the pin moved.</td></tr>
+      <tr><td><code>CLAIMS-1b.md</code> + <code>data/probe-1b.json</code></td><td>The fix's claims and the batteries they are measured against, sealed in a commit before any code that measures them, and never edited after.</td></tr>
+      <tr><td><code>tools/measure.mjs</code></td><td>Runs the sealed batteries against the first build's code (read from git) and the code now; writes <a href="receipts/step1b.json"><code>receipts/step1b.json</code></a>.</td></tr>
+      <tr><td><code>tools/trace.mjs</code> · <code>tools/gates.mjs</code> · <code>tools/page-check.mjs</code></td><td>The traced run above; the gate receipt; and the check that this page carries no typed-in number, none of our prices, the credits and every section.</td></tr>
+      <tr><td><code>vendor/</code></td><td>The cost case's kernel, its tests and its sourced figures, copied byte for byte from <a href="https://sjgant80-hub.github.io/liveware/">liveware</a>; a test fails if a byte changes.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The sealed claims, measured once</h3>
+  <p>The fix was sealed before it was built: what it had to show, and the test lines it would be measured on. Each claim was then measured once, against the first build and against the code now. <span data-r="claimsHeld"></span> held, <span data-r="claimsFailed"></span> failed, <span data-r="claimsRecorded"></span> was recorded only (the before-picture). A claim that fails stays failed on the record.</p>
+  <div class="scroll"><table id="claim-table"><thead><tr><th>Claim</th><th>The bar</th><th>First build</th><th>Now</th><th>Verdict</th></tr></thead><tbody></tbody></table></div>
+  <p>Before and after, with the estate's mutation gate: on the first build's kernel, with the first build's tests, witness killed <span data-r="step1Killed"></span> of <span data-r="step1Mutants"></span> mutants and <span class="bad"><span data-r="step1Survived"></span> survived</span> — lines the tests did not really guard. On the fixed kernel it killed <span data-r="kernelKilled"></span> of <span data-r="kernelMutants"></span>.</p>
+
+  <h3>The team it was built for</h3>
   <div class="grid">
-    <div class="card"><b>KAR</b> — conductor. Reads the feed, assigns, writes the rollup. Never ships or spends.</div>
-    <div class="card"><b>BUILDER</b> — builds against the gate, seals claims. Never merges or releases without the auditor + Simon.</div>
-    <div class="card"><b>AUDITOR</b> — separate judge. Claims vs receipts, re-runs tests. Never builds.</div>
-    <div class="card"><b>MONEY&nbsp;TIME · REACH · SCOUT · CLIENT&nbsp;LEAD · CARD&nbsp;KEEPER</b> — sell, post, watch, intake, sign. Each stays in its lane.</div>
+    <div class="card"><b>KAR</b> — conducts. Reads the feed, assigns, writes the rollup. Never ships or spends.</div>
+    <div class="card"><b>BUILDER</b> — builds against the gate, seals claims first. Never merges or releases without the auditor and the person.</div>
+    <div class="card"><b>AUDITOR</b> — a separate judge. Checks claims against receipts and re-runs them. Never builds.</div>
+    <div class="card"><b>MONEY&nbsp;TIME · REACH · SCOUT · CLIENT&nbsp;LEAD · CARD&nbsp;KEEPER</b> — sell, post, watch, take enquiries, sign releases. Each stays in its own lane.</div>
   </div>
-  <p>Ten rules govern the team (one role per bot · seal "done" first · every claim links a re-runnable receipt · allowed tools only · the auditor checks everything before it moves · <span class="flag">NEEDS SIMON</span> for anything public/paid/risky · plain language · no earnings or crypto claims · follow platform rules · failures stay on record).</p>
+  <p>The rules the team works to: one role per bot; seal "done" before claiming it; every claim links a re-runnable receipt; allowed tools only; the auditor checks everything before it moves; NEEDS SIMON for anything public, paid or risky; plain language; no promises about money; follow each platform's rules; failures stay on the record. The kit enforces the ones a file can: the receipt rule, the NEEDS SIMON rule, and no secrets on disk.</p>
 
-  <h2>6 · For your team</h2>
+  <h2 id="adoption">Adoption — what it does for your team, and how you roll it out</h2>
+  <div class="grid">
+    <div class="card"><b>You run more than one AI agent.</b> You already have the questions this answers: who did what, is it true, and did anything leak. Today the answers are scattered across chat windows and terminal logs.</div>
+    <div class="card"><b>After.</b> Every agent writes to one file. The person reads one page a morning. "Done" without proof arrives flagged at the top. Keys pasted by mistake never reach the file.</div>
+    <div class="card"><b>What changes for people.</b> Nobody has to ask a bot what it did. The person signs off on what is waiting at the top of the page; the auditor works from the same file.</div>
+  </div>
+  <h3>Roll-out</h3>
+  <ol>
+    <li><b>Pick where the feed lives</b> — a folder on the machine the bots run on. Set <code>BOT_TEAM_FEED</code> to its path, or pass <code>--feed</code>.</li>
+    <li><b>Give every bot one instruction:</b> record each action through <code>src/feed.mjs</code> (the command line, or <code>import { append }</code>). <code>skills/feed-write/SKILL.md</code> is that instruction, ready to load.</li>
+    <li><b>Schedule the rollup</b> each morning: <code>node src/rollup.mjs --out AGENT_FEED.md</code>.</li>
+    <li><b>Put a separate auditor on NEEDS SIMON</b> — a bot or a person that re-runs each receipt before anything moves.</li>
+    <li><b>Add your own secret shapes.</b> One line in <code>REDACTIONS</code> in <code>src/kernel.mjs</code> plus a test; the mutation gate keeps that test honest, and the rollup applies the new rule to old lines too.</li>
+  </ol>
+
+  <h2 id="paper">White paper — why one feed</h2>
+  <div class="card paper">
+    <h3 style="margin-top:0">The problem</h3>
+    <p>When several AI agents share work, things go wrong quietly. Work is claimed and not done — "shipped", "tests passed" — and nobody checks. Secrets travel: an agent pastes a key into a status message and it sits in a log for good. And the person in charge has no single place to see what happened, so oversight becomes asking each agent in turn, and believing it.</p>
+    <h3>The design</h3>
+    <p><b>One feed.</b> Every action is one JSON line in one append-only file, so there is one place to look and hand-offs happen in the open. <b>Clean at the door.</b> The writer strips secrets from every string in the line, at any depth, before anything touches disk — a refused line comes back redacted too. <b>Claims carry proof.</b> A line that says work is finished — a finishing word that is not negated, or a <code>build</code> or <code>receipt</code> line — must carry a receipt hash or a proof link, or it is flagged. <b>A page a person can trust.</b> The rollup prints each field on one physical line and redacts it again, so neither formatting nor a line written by another tool can forge or leak into it, and lines it cannot read are reported, not dropped. <b>A separate judge.</b> The kit checks the shape of proof; the auditor re-runs it, and anything public, paid or risky waits for the person.</p>
+    <h3>The evidence</h3>
+    <p>Reading the first build's code found it redacted only top-level text, missed common key shapes, read a card followed by its security code as one wrong number, accepted "see above" as proof, and let a line break forge a heading. The fix was sealed before it was written. Measured once against the sealed batteries: the first build leaked <span data-r="leaksStep1"></span> of <span data-r="leakShapes"></span> secret shapes and the fixed code leaks <span data-r="leaksNow"></span>; it flagged <span data-r="claimsFlaggedStep1"></span> of <span data-r="claimLines"></span> unproven claims and now flags <span data-r="claimsFlaggedNow"></span>, while flagging <span data-r="plainFlaggedNow"></span> of <span data-r="plainLines"></span> lines that claim nothing; <span data-r="cleanUnchangedNow"></span> of <span data-r="cleanLines"></span> lines holding no secret pass through untouched; the forged rollup fails <span data-r="forgeFailedStep1"></span> of <span data-r="forgeChecks"></span> structure checks on the first build and none now. The first build's own fuzz of <span data-r="fuzzLines"></span> generated secrets still leaks none.</p>
+    <h3>What it does not claim</h3>
+    <p>The batteries were written by the same hand that fixed the code, after reading it: they show which shapes are covered, not how a stranger's wording would fare. Lines are not signed here — anything that can write the file can write a line under any name; the signed team feed, which binds each line to its bot's key, is in <a href="https://sjgant80-hub.github.io/ai-first-company/#team">ai-first-company</a>. And the kit checks that a proof looks like a proof; whether it is true is the auditor's job.</p>
+    <h3>Where it fits</h3>
+    <p>This is the nervous system of a company run by bots and overseen by a person: the shared feed, the rules a file can enforce, and the morning page. The team, its fences, its signed feed and its separate auditor are built in <a href="https://sjgant80-hub.github.io/ai-first-company/#team">ai-first-company</a>; the mutation gate is <a href="https://github.com/sjgant80-hub/witness">witness</a>.</p>
+  </div>
+
+  <h2 id="brochure">For business</h2>
+  <p class="lede"><b>Know what your AI agents did, with proof, on one page each morning — on your own machine, with nothing sent anywhere.</b></p>
+
+  <h3 id="roles">What it does for each role</h3>
+  <div class="grid roles">
+    <div class="card"><b>CEO</b>One page a morning: what the bots did, and what is waiting for a decision. Anything public, paid or risky stops for a person, by design.</div>
+    <div class="card"><b>CFO</b>The case below prices the checking work from your own hours and your own estimate of what the feed takes off. The kit calls no AI service and has no meter; it is MIT-licensed, so there is no licence fee.</div>
+    <div class="card"><b>COO</b>Hand-offs happen in one file, in the open. "Done" without proof is flagged at the top, not discovered later. The same feed always produces the same page.</div>
+    <div class="card"><b>CTO / CISO</b>No network, no dependencies, no service: a few short files that read and write one local file. Secrets are stripped when a line is written and again when the page is built. Mutation-gated on GitHub's runner on every change.</div>
+    <div class="card"><b>Team leads</b>One command to record, one to roll up, and a ready-made skill for Claude Code, Codex or Grok. Any agent that can run Node.js can join.</div>
+    <div class="card"><b>The people on the team</b>Nobody chases a bot in chat to find out what it did. The page shows who did what and what needs them.</div>
+  </div>
+
+  <h3 id="cost">What the oversight costs you now — and what owning it costs</h3>
   <div class="card">
-    If you run more than one AI agent, you already have the problem this solves: who did what, was it true, and did anything leak. Point every agent at one <code>feed.mjs</code>, read the rollup each morning, and let a separate auditor re-run the receipts. It's one file to adopt, MIT, zero dependencies, and every claim it makes about itself is one command away from proof.
+    <p class="mut" style="margin-top:0">Your numbers, a published method. The work: the hours someone spends each week finding out what the bots did, checking whether "done" is true, and writing the status up. Staff time is priced at the UK median hourly pay with no employer on-costs — a floor, not a top end — and inflation is applied to every later year. Every outside figure comes from its published source, listed below. Computed in your browser by <code>src/mintcase.mjs</code>, a gated kernel vendored byte for byte from liveware (witness killed <span data-r="costKilled"></span> of <span data-r="costMutants"></span> of its mutants here). Change any input.</p>
+    <div class="costin">
+      <label>Hours a week spent checking on the bots <input id="c-hours" type="number" min="0" max="168" step="1"></label>
+      <label>Share of that work the feed takes off, % <input id="c-share" type="number" min="0" max="100" step="5"><small>your estimate</small></label>
+      <label>People who would get a rented AI assistant instead <input id="c-seats" type="number" min="0" max="10000" step="1"></label>
+      <label>Feed lines a week <input id="c-cases" type="number" min="0" max="10000000" step="50"><small>what a cloud model would have to read</small></label>
+      <label>Tokens a cloud model reads per line <input id="c-tin" type="number" min="0" max="1000000" step="100"><small>the line plus its instructions</small></label>
+      <label>Tokens it writes back per line <input id="c-tout" type="number" min="0" max="1000000" step="50"></label>
+      <label>Years to compare <input id="c-years" type="number" min="1" max="10" step="1"></label>
+    </div>
+    <p class="costhead" id="c-head" aria-live="polite"></p>
+    <div class="scroll"><table id="c-table"><thead><tr><th>Route</th><th>What happens</th><th class="num">A year</th><th class="num" id="c-overh">Over the period</th></tr></thead><tbody></tbody></table></div>
+    <p class="mut" id="c-note" style="font-size:14px"></p>
+    <details><summary>Where every figure comes from</summary><ul id="c-src"></ul></details>
+  </div>
+
+  <div class="grid">
+    <div class="card" id="security"><b>Security and data protection</b>
+      <ul>
+        <li><b>Nothing leaves the machine.</b> The kit's code imports only Node's file, path, OS and URL helpers — no network, no child processes. A test on GitHub's runner fails if that ever changes.</li>
+        <li><b>Secrets never reach disk.</b> Every string in a line, at any depth, is redacted before it is written; a refused line is redacted too. The morning page redacts again, so a line written by any other tool cannot carry a secret into it.</li>
+        <li><b>Less personal data by design.</b> Email addresses and card numbers are removed before a line is stored, and the feed lives in a file you control, on a machine you control — no account, no database, no outside processor.</li>
+        <li><b>Nothing to install but Node.js.</b> No dependencies, so no supply chain to vet beyond the files themselves, which are short enough to read.</li>
+      </ul>
+    </div>
+    <div class="card" id="ownership"><b>Ownership, support and exit</b>
+      <ul>
+        <li><b>Supplied by <a href="https://www.ai-nativesolutions.com">AI Native Solutions</a></b> — start a conversation there.</li>
+        <li><b>You own what you run.</b> The code is MIT: no licence fee, no lock-in, and it keeps running without us.</li>
+        <li><b>Support, service levels, warranty and liability</b> are agreed per deployment, in that deployment's agreement.</li>
+        <li><b>Exit is a file.</b> The feed is plain JSON lines that any tool reads; stop using the kit and the record stays yours.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" id="rollout"><b>Roll-out — what happens, and what we need from you</b>
+    <ol>
+      <li><b>A first conversation</b> through <a href="https://www.ai-nativesolutions.com">ai-nativesolutions.com</a>: which agents you run, where they run, and who signs off on their work.</li>
+      <li><b>Install on the machine the agents use</b> — a clone of this repository and Node.js. Nothing else is installed.</li>
+      <li><b>Point each agent at the feed</b> with the ready-made skill, and add rules for any secret shapes particular to you, each with its test.</li>
+      <li><b>Schedule the morning page</b> and name its reader — and a separate auditor for what lands in NEEDS SIMON.</li>
+      <li><b>Live.</b> From then on the agents write, the page builds itself each morning, and nothing moves outward without the person.</li>
+    </ol>
+  </div>
+
+  <div class="card" id="risks"><b>Risks, answered straight</b>
+    <dl class="risks">
+      <dt>What if a secret has a shape the kit does not know?</dt><dd>It is stored as written. The kit removes the shapes its rules cover — the sealed battery lists them, and the fixed code leaks none of them. Adding a shape is one line and a test, and the morning page applies it to old lines too. The first defence is still to keep secrets out of what bots write.</dd>
+      <dt>Can a bot fake "done"?</dt><dd>It can write the words; it cannot stop the flag. A claim without a receipt hash or a proof link is flagged and goes to the top of the page. A proof link is checked for its shape, not its truth: the separate auditor re-runs it.</dd>
+      <dt>Can a bot pretend to be another bot?</dt><dd>In this kit, yes: lines are not signed, so anything that can write the file can write any name. Formatting cannot forge the page, which is measured. For lines bound to each bot's own key, use the signed feed in ai-first-company.</dd>
+      <dt>What if the feed file is damaged?</dt><dd>Lines that cannot be read are counted and reported as a blocker at the top of the page, never dropped in silence — measured on a damaged feed.</dd>
+      <dt>What about personal data such as names?</dt><dd>Emails and card numbers are removed; names and free text are not. Bots should record actions, not customer records — and a rule can be added for any identifier you handle.</dd>
+      <dt>Is it tied to one AI vendor?</dt><dd>No. Any agent that can run Node.js — or append one JSON line — can use it, and the page reads the same whichever model wrote the lines.</dd>
+      <dt>Who checked the checks?</dt><dd>The mutation gate: witness broke every organ one operator at a time and the tests caught every broken copy, on GitHub's runner. The test batteries were written after reading the code and say so; the gate is the independent check that the tests bite.</dd>
+      <dt>What does it need to run?</dt><dd>Node.js on the machine the agents already use. The work per line takes a moment of processor time.</dd>
+    </dl>
+  </div>
+
+  <div class="card board" id="board"><b>The case for your board</b><p id="c-board" style="margin-bottom:0"></p></div>
+
+  <div class="card">
+    <p style="margin-top:0"><b>Supplied by AI Native Solutions.</b> Start at <a href="https://www.ai-nativesolutions.com">ai-nativesolutions.com</a>, or read the code first — it is all here.</p>
+    <div class="cta">
+      <a href="https://www.ai-nativesolutions.com">Talk to AI Native Solutions</a>
+      <a href="https://github.com/sjgant80-hub/bot-team-kit">Read the code</a>
+    </div>
   </div>
 
   <div class="foot">
-    AI Native Solutions. Checking is automated and separate; anything public, paid or risky waits for the human. Built and gated by Kar; overseen by Simon.
+    <p>Powered by the Konomi architecture, created by Thomas Frumkin.</p>
+    <p>Supplied by <a href="https://www.ai-nativesolutions.com">AI Native Solutions</a> · MIT · <a href="https://github.com/sjgant80-hub/bot-team-kit">source</a> · receipts: <a href="receipts/step1b.json">claims</a>, <a href="receipts/witness.json">gates</a>, <a href="receipts/trace.json">trace</a> · checking is automated and separate; anything public, paid or risky waits for a person.</p>
   </div>
 </div>
+<script type="module" src="page/app.mjs"></script>
 </body>
 </html>

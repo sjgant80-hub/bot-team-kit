@@ -4,12 +4,17 @@
   "title": "Bot-team shared feed line",
   "description": "One JSON object per line in .estate/feed.jsonl. Every bot reads and writes the same feed; hand-offs happen here, not in private chats.",
   "type": "object",
-  "required": ["ts", "agent", "kind", "what"],
+  "required": [
+    "ts",
+    "agent",
+    "kind",
+    "what"
+  ],
   "additionalProperties": true,
   "properties": {
     "ts": {
       "type": "string",
-      "description": "ISO 8601 timestamp, UTC.",
+      "description": "ISO 8601 time; the writer sets it when the caller does not.",
       "format": "date-time"
     },
     "agent": {
@@ -18,15 +23,26 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["task", "handoff", "build", "receipt", "listing", "post", "lead", "decision", "blocker", "note"]
+      "enum": [
+        "task",
+        "handoff",
+        "build",
+        "receipt",
+        "listing",
+        "post",
+        "lead",
+        "decision",
+        "blocker",
+        "note"
+      ]
     },
     "what": {
       "type": "string",
-      "description": "Plain-language action. Auto-redacted for keys/tokens/emails/card numbers before it reaches disk."
+      "description": "Plain-language action. Every string in the line, at any depth (nested fields and lists included), is redacted for keys, tokens, passwords, emails and card numbers before it reaches disk."
     },
     "link": {
       "type": "string",
-      "description": "URL or path to the artifact/proof."
+      "description": "Proof or artifact: an http(s) URL, a repository path or a file name. Free text such as \"see above\" is not proof."
     },
     "needs_owner": {
       "type": "string",
@@ -35,12 +51,14 @@
     "receipt_sha256": {
       "type": "string",
       "pattern": "^[0-9a-fA-F]{64}$",
-      "description": "Hash of the re-runnable receipt. A 'done' claim with no receipt link is auto-flagged."
+      "description": "Hash of the re-runnable receipt. A done claim (a done-word that is not negated, or kind build / receipt) with no receipt and no proof link is auto-flagged."
     },
     "flags": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Set by the feed writer, e.g. 'done-without-receipt'. Not written by the caller."
+      "items": {
+        "type": "string"
+      },
+      "description": "Set by the feed writer, e.g. done-without-receipt. Flags a caller sets are ignored and recomputed."
     }
   }
 }

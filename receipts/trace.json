@@ -1,0 +1,179 @@
+{
+  "receipt": "bot-team-kit T1 — one real run through append() and buildRollup(), fixed clock",
+  "date": "2026-11-04",
+  "steps": [
+    {
+      "input": {
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "built the rollup, every test passed",
+        "link": "receipts/step1b.json"
+      },
+      "stamped": {
+        "ts": "2026-11-04T07:10:00.000Z",
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "built the rollup, every test passed",
+        "link": "receipts/step1b.json"
+      },
+      "redacted": {
+        "ts": "2026-11-04T07:10:00.000Z",
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "built the rollup, every test passed",
+        "link": "receipts/step1b.json"
+      },
+      "flags": [],
+      "valid": {
+        "ok": true,
+        "errors": []
+      },
+      "stored": {
+        "ts": "2026-11-04T07:10:00.000Z",
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "built the rollup, every test passed",
+        "link": "receipts/step1b.json"
+      }
+    },
+    {
+      "input": {
+        "agent": "REACH",
+        "kind": "post",
+        "what": "draft post ready; reply to ops@example.com, login password: hunter2-on-the-box"
+      },
+      "stamped": {
+        "ts": "2026-11-04T07:20:00.000Z",
+        "agent": "REACH",
+        "kind": "post",
+        "what": "draft post ready; reply to ops@example.com, login password: hunter2-on-the-box"
+      },
+      "redacted": {
+        "ts": "2026-11-04T07:20:00.000Z",
+        "agent": "REACH",
+        "kind": "post",
+        "what": "draft post ready; reply to [REDACTED:email], login [REDACTED:password]"
+      },
+      "flags": [],
+      "valid": {
+        "ok": true,
+        "errors": []
+      },
+      "stored": {
+        "ts": "2026-11-04T07:20:00.000Z",
+        "agent": "REACH",
+        "kind": "post",
+        "what": "draft post ready; reply to [REDACTED:email], login [REDACTED:password]"
+      }
+    },
+    {
+      "input": {
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "shipped the page"
+      },
+      "stamped": {
+        "ts": "2026-11-04T07:30:00.000Z",
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "shipped the page"
+      },
+      "redacted": {
+        "ts": "2026-11-04T07:30:00.000Z",
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "shipped the page"
+      },
+      "flags": [
+        "done-without-receipt"
+      ],
+      "valid": {
+        "ok": true,
+        "errors": []
+      },
+      "stored": {
+        "ts": "2026-11-04T07:30:00.000Z",
+        "agent": "BUILDER",
+        "kind": "build",
+        "what": "shipped the page",
+        "flags": [
+          "done-without-receipt"
+        ]
+      }
+    },
+    {
+      "input": {
+        "agent": "AUDITOR",
+        "kind": "note",
+        "what": "PASS: the rollup build, receipt re-run clean",
+        "link": "receipts/step1b.json"
+      },
+      "stamped": {
+        "ts": "2026-11-04T07:40:00.000Z",
+        "agent": "AUDITOR",
+        "kind": "note",
+        "what": "PASS: the rollup build, receipt re-run clean",
+        "link": "receipts/step1b.json"
+      },
+      "redacted": {
+        "ts": "2026-11-04T07:40:00.000Z",
+        "agent": "AUDITOR",
+        "kind": "note",
+        "what": "PASS: the rollup build, receipt re-run clean",
+        "link": "receipts/step1b.json"
+      },
+      "flags": [],
+      "valid": {
+        "ok": true,
+        "errors": []
+      },
+      "stored": {
+        "ts": "2026-11-04T07:40:00.000Z",
+        "agent": "AUDITOR",
+        "kind": "note",
+        "what": "PASS: the rollup build, receipt re-run clean",
+        "link": "receipts/step1b.json"
+      }
+    }
+  ],
+  "feedFile": [
+    {
+      "ts": "2026-11-04T07:10:00.000Z",
+      "agent": "BUILDER",
+      "kind": "build",
+      "what": "built the rollup, every test passed",
+      "link": "receipts/step1b.json"
+    },
+    {
+      "ts": "2026-11-04T07:20:00.000Z",
+      "agent": "REACH",
+      "kind": "post",
+      "what": "draft post ready; reply to [REDACTED:email], login [REDACTED:password]"
+    },
+    {
+      "ts": "2026-11-04T07:30:00.000Z",
+      "agent": "BUILDER",
+      "kind": "build",
+      "what": "shipped the page",
+      "flags": [
+        "done-without-receipt"
+      ]
+    },
+    {
+      "ts": "2026-11-04T07:40:00.000Z",
+      "agent": "AUDITOR",
+      "kind": "note",
+      "what": "PASS: the rollup build, receipt re-run clean",
+      "link": "receipts/step1b.json"
+    }
+  ],
+  "rollup": "# AGENT_FEED — 2026-11-04\n\n## NEEDS SIMON\n- [build] shipped the page ⚑ FLAGGED: done-without-receipt — from BUILDER\n- [post] draft post ready; reply to [REDACTED:email], login [REDACTED:password] — from REACH\n\n## AUDITOR\n- [note] PASS: the rollup build, receipt re-run clean (receipts/step1b.json)\n\n## BUILDER\n- [build] shipped the page ⚑ FLAGGED: done-without-receipt\n- [build] built the rollup, every test passed (receipts/step1b.json)\n\n## REACH\n- [post] draft post ready; reply to [REDACTED:email], login [REDACTED:password]\n",
+  "counts": {
+    "lines": 4,
+    "stored": 4,
+    "redactedFields": 1,
+    "flagged": 1,
+    "needsSimon": 2
+  },
+  "reproduce": "node tools/trace.mjs --check"
+}

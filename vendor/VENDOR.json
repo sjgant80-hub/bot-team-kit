@@ -1,0 +1,9 @@
+{
+  "about": "Files copied byte for byte from another estate repository. They are not edited here; test/pins.test.mjs fails if one changes. Re-vendor by copying the new bytes from the source commit and moving the pins (a new seal if a measured claim depends on them).",
+  "source": { "repo": "https://github.com/sjgant80-hub/liveware", "commit": "ee580e4bebeeb1ddbf2fb30817a471572a414c80", "read": "2026-11-04" },
+  "files": [
+    { "path": "src/mintcase.mjs", "from": "src/mintcase.mjs", "sha256": "890be73fd6ece622ccb424e0c191c22738198a01bc177ebe5b362b9ddcb69eef", "what": "the cost case for one process: staff time today, rented assistant licences, a cloud model on every case, and owning it; pure, total, witness-gated in liveware" },
+    { "path": "test/mintcase.test.mjs", "from": "test/mintcase.test.mjs", "sha256": "347b15b84f84f7870b34137b2f77cc292f70047e43f326995ccbbbe428f87c63", "what": "its test suite, unchanged, so witness gates it here exactly as there" },
+    { "path": "vendor/ai-first-company/vendor/sovereign-enterprise/data/basis.json", "from": "vendor/ai-first-company/vendor/sovereign-enterprise/data/basis.json", "sha256": "83e9c2effa2f81596dcfa7110f030940032c1910cdf928d27d628ae59d73bb42", "what": "every external figure the cost case reads, each with its source (ONS, DESNZ, ECB, Microsoft, Anthropic, Intel)" }
+  ]
+}

@@ -1,0 +1,207 @@
+{
+  "receipt": "bot-team-kit gates — tests, step 1’s curated gate (G2), witness v0.6 on every organ (G1) and on step 1’s kernel (G0)",
+  "witness": {
+    "repo": "https://github.com/sjgant80-hub/witness",
+    "tag": "v0.6",
+    "cap": 800
+  },
+  "tests": {
+    "files": [
+      "test/test.mjs",
+      "test/kernel.test.mjs",
+      "test/io.test.mjs",
+      "test/mintcase.test.mjs",
+      "test/pins.test.mjs",
+      "test/page.test.mjs"
+    ],
+    "total": 84,
+    "passed": 84,
+    "failed": 0
+  },
+  "g2": {
+    "killed": 18,
+    "listed": 18,
+    "green": true
+  },
+  "organs": [
+    {
+      "file": "src/kernel.mjs",
+      "sha256": "0551256cf813718698718b6c03e0c32fb7a95d9b2b8c0b6ebfbc3223065d39a7",
+      "tests": [
+        "test/test.mjs",
+        "test/kernel.test.mjs"
+      ],
+      "job": "redact, flag, validate, normalize, roll up — the pure gated surface",
+      "witness": {
+        "total": 84,
+        "killed": 84,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [],
+        "clean": true
+      }
+    },
+    {
+      "file": "src/feed.mjs",
+      "sha256": "b1107fd1f4d7f2a8346ab7c7aee51cab315d9b6b3b107368f79f94b3714d86e6",
+      "tests": [
+        "test/io.test.mjs"
+      ],
+      "job": "append one redacted, flagged, valid line; read the feed and count unreadable lines; the CLI",
+      "witness": {
+        "total": 21,
+        "killed": 21,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [],
+        "clean": true
+      }
+    },
+    {
+      "file": "src/rollup.mjs",
+      "sha256": "817a4666e620b127cacef27223a3e1d1c401585d5eb366e6d8d80f4a2d9d6e5f",
+      "tests": [
+        "test/io.test.mjs"
+      ],
+      "job": "read the feed, write AGENT_FEED.md with NEEDS SIMON first; the CLI",
+      "witness": {
+        "total": 2,
+        "killed": 2,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [],
+        "clean": true
+      }
+    },
+    {
+      "file": "src/mintcase.mjs",
+      "sha256": "890be73fd6ece622ccb424e0c191c22738198a01bc177ebe5b362b9ddcb69eef",
+      "tests": [
+        "test/mintcase.test.mjs"
+      ],
+      "job": "the cost case from the sourced basis (liveware’s gated kernel, vendored byte for byte)",
+      "witness": {
+        "total": 21,
+        "killed": 21,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [],
+        "clean": true
+      }
+    }
+  ],
+  "g0": {
+    "file": "src/kernel.mjs at 4c20fd9, with step 1’s tests",
+    "witness": {
+      "total": 66,
+      "killed": 47,
+      "survived": 19,
+      "capped": false,
+      "survivors": [
+        {
+          "line": 29,
+          "mutation": "> → >=",
+          "snippet": "if (s.length < 13 || s.length > 19) return false;"
+        },
+        {
+          "line": 35,
+          "mutation": "> → >=",
+          "snippet": "if (dbl) { d *= 2; if (d > 9) d -= 9; }"
+        },
+        {
+          "line": 75,
+          "mutation": "> → >=",
+          "snippet": "const hasLink = typeof src.link === 'string' && src.link.trim().length > 0;"
+        },
+        {
+          "line": 103,
+          "mutation": "> → >=",
+          "snippet": "if (flags.length > 0) out.flags = flags;"
+        },
+        {
+          "line": 115,
+          "mutation": "> → >=",
+          "snippet": "if (line && Array.isArray(line.flags) && line.flags.length > 0) return true;"
+        },
+        {
+          "line": 130,
+          "mutation": "> → >=",
+          "snippet": "if (a.line.ts > b.line.ts) return -1;"
+        },
+        {
+          "line": 29,
+          "mutation": "< → <=",
+          "snippet": "if (s.length < 13 || s.length > 19) return false;"
+        },
+        {
+          "line": 129,
+          "mutation": "< → <=",
+          "snippet": "if (a.line.ts < b.line.ts) return 1;"
+        },
+        {
+          "line": 59,
+          "mutation": "=== → !==",
+          "snippet": "const src = (line && typeof line === 'object') ? line : {};"
+        },
+        {
+          "line": 62,
+          "mutation": "=== → !==",
+          "snippet": "out[k] = (typeof v === 'string') ? redact(v) : v;"
+        },
+        {
+          "line": 59,
+          "mutation": "&& → ||",
+          "snippet": "const src = (line && typeof line === 'object') ? line : {};"
+        },
+        {
+          "line": 72,
+          "mutation": "&& → ||",
+          "snippet": "const src = (line && typeof line === 'object') ? line : {};"
+        },
+        {
+          "line": 74,
+          "mutation": "&& → ||",
+          "snippet": "const hasReceipt = typeof src.receipt_sha256 === 'string' && /^[0-9a-f]{64}$/i.test(src.re"
+        },
+        {
+          "line": 87,
+          "mutation": "&& → ||",
+          "snippet": "const src = (line && typeof line === 'object') ? line : {};"
+        },
+        {
+          "line": 137,
+          "mutation": "&& → ||",
+          "snippet": ".filter((l) => l && typeof l === 'object')"
+        },
+        {
+          "line": 29,
+          "mutation": "|| → &&",
+          "snippet": "if (s.length < 13 || s.length > 19) return false;"
+        },
+        {
+          "line": 34,
+          "mutation": "|| → &&",
+          "snippet": "if (d < 0 || d > 9) return false;"
+        },
+        {
+          "line": 29,
+          "mutation": "return false → return true",
+          "snippet": "if (s.length < 13 || s.length > 19) return false;"
+        },
+        {
+          "line": 34,
+          "mutation": "return false → return true",
+          "snippet": "if (d < 0 || d > 9) return false;"
+        }
+      ],
+      "ignored": [],
+      "clean": false
+    }
+  },
+  "allClean": true,
+  "reproduce": "see .github/workflows/ci.yml — CI runs witness on each organ, then node tools/gates.mjs --witness-dir <dir> --check"
+}

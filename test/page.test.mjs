@@ -13,7 +13,7 @@ const rd = (p) => readFileSync(join(root, p), 'utf8');
 const j = (p) => JSON.parse(rd(p));
 const HTML = rd('index.html');
 const APP = rd('page/app.mjs');
-const FACTS = facts({ step1b: j('receipts/step1b.json'), witness: j('receipts/witness.json'), trace: j('receipts/trace.json'), walks: existsSync(join(root, 'data/persona-walks.json')) ? j('data/persona-walks.json') : undefined });
+const FACTS = facts({ step1b: j('receipts/step1b.json'), witness: j('receipts/witness.json'), trace: j('receipts/trace.json'), walks: existsSync(join(root, 'data/persona-walks.json')) ? j('data/persona-walks.json') : undefined, claims: j('receipts/claims.json') });
 const exists = (p) => existsSync(join(root, p));
 const run = (patch = {}) => check({ html: HTML, app: APP, facts: FACTS, exists, ...patch });
 
@@ -79,6 +79,20 @@ test('facts · reads the committed receipts', () => {
   assert.equal(FACTS.kernelKilled, w.organs[0].witness.killed);
   assert.equal(FACTS.organMutants, w.organs.reduce((n, o) => n + o.witness.total, 0));
   assert.equal(FACTS.allClean, w.allClean ? 'clean' : 'not clean');
-  assert.equal(FACTS.claimsHeld, j('receipts/step1b.json').summary.held);
+  const c = j('receipts/claims.json');
+  assert.equal(FACTS.claimsSealed, c.summary.sealed);
+  assert.equal(FACTS.claimsHeld, c.summary.held);
+  assert.equal(FACTS.claimsFailed, c.summary.failed);
+  assert.equal(FACTS.claimsRecorded, c.summary.recorded);
+  assert.equal(FACTS.leaksNow, j('receipts/step1b.json').claims.find((x) => x.id === 'L2').measured.now.leaked);
   assert.equal(FACTS.traceLines, j('receipts/trace.json').counts.lines);
+  const wk = j('data/persona-walks.json').walks;
+  assert.equal(FACTS.walkGaps, wk.flatMap((w) => w.gaps).length);
+  assert.equal(FACTS.walkRounds, new Set(wk.map((w) => w.round ?? 1)).size);
+});
+
+test('facts · the badge counts every claim the seal names, not only the battery claims', () => {
+  const sealed = readFileSync(join(root, 'CLAIMS-1b.md'), 'utf8').split('\n').filter((l) => /^\|\s*[A-Z]\d+\s*\|/.test(l)).length;
+  assert.equal(FACTS.claimsSealed, sealed);
+  assert.equal(FACTS.claimsHeld + FACTS.claimsFailed + FACTS.claimsRecorded, sealed);
 });

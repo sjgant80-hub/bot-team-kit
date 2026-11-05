@@ -40,7 +40,7 @@ function readWitness(name) {
 }
 
 // every test file, counted by node's own TAP reporter
-const testFiles = ['test/test.mjs', 'test/kernel.test.mjs', 'test/io.test.mjs', 'test/mintcase.test.mjs', 'test/pins.test.mjs', 'test/page.test.mjs'];
+const testFiles = ['test/test.mjs', 'test/kernel.test.mjs', 'test/io.test.mjs', 'test/mintcase.test.mjs', 'test/pins.test.mjs', 'test/page.test.mjs', 'test/claims.test.mjs'];
 const t = run(['--test', '--test-reporter=tap', ...testFiles]);
 const count = (k) => Number((t.stdout.match(new RegExp(`^# ${k} (\\d+)$`, 'm')) || [])[1]);
 const tests = { files: testFiles, total: count('tests'), passed: count('pass'), failed: count('fail') };

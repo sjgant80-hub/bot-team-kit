@@ -12,10 +12,11 @@
       "test/io.test.mjs",
       "test/mintcase.test.mjs",
       "test/pins.test.mjs",
-      "test/page.test.mjs"
+      "test/page.test.mjs",
+      "test/claims.test.mjs"
     ],
-    "total": 84,
-    "passed": 84,
+    "total": 92,
+    "passed": 92,
     "failed": 0
   },
   "g2": {

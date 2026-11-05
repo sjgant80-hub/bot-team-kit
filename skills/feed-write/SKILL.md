@@ -76,5 +76,5 @@ re-audited and the pin moved.
 ## Rules this skill enforces (from RULES.md)
 - Rule 3: every claim links a re-runnable receipt — `done` without one is flagged.
 - Rule 6: `needs_owner: Simon` for anything public/paid/risky.
-- Secrets never reach disk: redaction runs before validation, so a rejected line
+- Known secret shapes never reach disk: redaction runs before validation, so a rejected line
   is still redacted.

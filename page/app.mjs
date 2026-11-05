@@ -13,10 +13,10 @@ const el = (tag, attrs, ...kids) => {
 const code = (s) => el('code', {}, s);
 const getJSON = async (p) => { try { const r = await fetch(p, { cache: 'no-cache' }); return r.ok ? await r.json() : null; } catch { return null; } };
 
-const [step1b, witness, trace, walks, probe, basis] = await Promise.all([
+const [step1b, witness, trace, walks, probe, basis, claims] = await Promise.all([
   getJSON('receipts/step1b.json'), getJSON('receipts/witness.json'), getJSON('receipts/trace.json'),
   getJSON('data/persona-walks.json'), getJSON('data/probe-1b.json'),
-  getJSON('vendor/ai-first-company/vendor/sovereign-enterprise/data/basis.json'),
+  getJSON('vendor/ai-first-company/vendor/sovereign-enterprise/data/basis.json'), getJSON('receipts/claims.json'),
 ]);
 const shaOf = (file) => { try { return witness.organs.find((o) => o.file === file).sha256.slice(0, 16); } catch { return String(Date.now()); } };
 const fresh = (path, file) => import(`${path}?v=${shaOf(file)}`);
@@ -25,7 +25,7 @@ const [K, M, F] = await Promise.all([
 ]);
 
 // ── the numbers in the prose ───────────────────────────────────────────────────────────────────
-const facts = F.facts({ step1b, witness, trace, walks });
+const facts = F.facts({ step1b, witness, trace, walks, claims });
 for (const n of document.querySelectorAll('[data-r]')) n.textContent = facts[n.dataset.r] ?? '—';
 
 // ── start here: the try-it panel, on the real kernel ───────────────────────────────────────────
@@ -132,17 +132,35 @@ const said = {
   R1: (m) => [m.step1 && `${m.step1.checks - m.step1.failedChecks.length} of ${m.step1.checks} checks hold`, m.now && `${m.now.checks - m.now.failedChecks.length} of ${m.now.checks} checks hold`],
   R2: (m) => [m.step1 && (m.step1.toldSimon ? 'Simon told' : 'lost in silence'), m.now && (m.now.toldSimon ? `Simon told: ${m.now.unreadable} unreadable` : 'lost in silence')],
 };
+// the claims the battery receipt does not hold, read from the evidence receipts/claims.json carries for each
+const saidMore = {
+  E1: (e) => ['', e.passed ? 'its test passes' : 'its test fails'],
+  G0: (e) => [`${e.killed} of ${e.total} killed, ${e.survived} survived`, ''],
+  G1: (e) => ['', `${e.killed} of ${e.total} killed across ${e.organs} organs, ${e.baselined} baselined`],
+  G2: (e) => [`${e.step1Listed} listed`, `${e.killed} of ${e.listed} caught` + (e.step1Kept ? ', every first-build break still listed' : ', a first-build break dropped')],
+  C1: (e) => ['', `${e.matched} of ${e.files} hashes match the seal`],
+  T1: (e) => ['', e.rederived ? 're-derived byte for byte' : 'does not re-derive'],
+  P1: (e) => ['', e.passed ? 'the check passes' : 'the check fails'],
+  W1: (e) => ['', `${e.gaps} gaps over ${e.rounds} rounds: ${e.fixed} fixed, ${e.needsSimon} need Simon, ${e.unanswered} unanswered`],
+};
 const meaning = {
   L1: 'secret shapes, first build', L2: 'secret shapes, now', L3: 'lines holding no secret pass untouched', L4: 'the first build’s own fuzz, now',
   F1: 'unproven claims are flagged', F2: 'lines that claim nothing are not', F3: 'what counts as proof', R1: 'a forged rollup', R2: 'a damaged feed',
+  E1: 'no network, no processes', G0: 'witness on the first build', G1: 'witness on every organ', G2: 'the curated gate', C1: 'the cost case, byte for byte',
+  T1: 'the traced run', P1: 'the page check', W1: 'the buyer walks',
 };
-if (step1b) {
+const measuredOf = (id) => { try { return step1b.claims.find((c) => c.id === id).measured || {}; } catch { return {}; } };
+const short = (s) => String(s ?? '').replace(/\b[0-9a-f]{64}\b/g, (h) => h.slice(0, 12) + '…');
+if (claims && Array.isArray(claims.claims)) {
   const tb = $('claim-table').querySelector('tbody');
-  for (const c of step1b.claims) {
-    const [a, b] = (said[c.id] || (() => ['', '']))(c.measured || {});
+  for (const c of claims.claims) {
+    const [a, b] = said[c.id] ? said[c.id](measuredOf(c.id)) : saidMore[c.id] ? saidMore[c.id](c.evidence || {}) : ['', ''];
     const v = c.held === null ? el('span', { class: 'mut' }, 'recorded') : el('span', { class: c.held ? 'ok' : 'bad' }, c.held ? 'held' : 'failed');
-    tb.append(el('tr', {}, el('td', {}, el('b', {}, c.id), ' ', el('span', { class: 'mut' }, meaning[c.id] || '')), el('td', {}, c.bar), el('td', {}, a || '—'), el('td', {}, b || '—'), el('td', {}, v)));
+    const head = el('td', {}, el('b', {}, c.id), ' ', meaning[c.id] || '', el('div', { class: 'mut sealed' }, short(c.claim)), c.where ? el('div', { class: 'mut sealed' }, 'verdict from ', code(c.where)) : '');
+    tb.append(el('tr', {}, head, el('td', {}, short(c.bar)), el('td', {}, a || '—'), el('td', {}, b || '—'), el('td', {}, v)));
   }
+} else {
+  $('claim-table').querySelector('tbody').append(el('tr', {}, el('td', { colspan: String($('claim-table').querySelectorAll('thead th').length) }, 'receipts/claims.json could not be loaded — reconnect and reload.')));
 }
 
 // ── for business: the cost case, computed by src/mintcase.mjs from the sourced basis ───────────
@@ -152,12 +170,34 @@ const inputs = { 'c-hours': D.hoursPerWeek, 'c-share': D.share * 100, 'c-seats':
 for (const [id, v] of Object.entries(inputs)) $(id).value = v;
 const product = (k) => { try { return basis[k].product; } catch { return ''; } };
 
+// each box is checked against its own range, in its own units, before the kernel sees it; the kernel's own refusal
+// stays as the backstop. Seats and years are whole numbers in the kernel.
+const WHOLE = new Set(['c-seats', 'c-years']);
+const boxName = (id) => { try { return $(id).parentElement.firstChild.textContent.trim(); } catch { return id; } };
+function badBox() {
+  for (const id of Object.keys(inputs)) {
+    const n = $(id), x = Number(n.value);
+    if (!Number.isFinite(x) || x < Number(n.min) || x > Number(n.max) || (WHOLE.has(id) && !Number.isInteger(x))) {
+      return `“${boxName(id)}” takes ${WHOLE.has(id) ? 'a whole number' : 'a number'} from ${n.min} to ${n.max}`;
+    }
+  }
+  return '';
+}
+// nothing stale beside a message: when the inputs cannot be used, the result is cleared
+function clearCost(message) {
+  $('c-head').textContent = message;
+  $('c-table').querySelector('tbody').textContent = '';
+  $('c-note').textContent = '';
+  $('c-board').textContent = 'Fill in the cost case above to see the case for your board.';
+}
 function renderCost() {
-  if (!basis) { $('c-head').textContent = 'The sourced figures could not be loaded — reconnect and reload.'; return; }
-  if (Object.keys(inputs).some((id) => $(id).value.trim() === '')) { $('c-head').textContent = 'Fill in every box to see the case.'; return; }
+  if (!basis) { clearCost('The sourced figures could not be loaded — reconnect and reload.'); return; }
+  if (Object.keys(inputs).some((id) => $(id).value.trim() === '')) { clearCost('Fill in every box to see the case.'); return; }
+  const bad = badBox();
+  if (bad) { clearCost('Check the inputs: ' + bad + '.'); return; }
   const v = (id) => Number($(id).value);
   const r = M.mintCase(basis, { hoursPerWeek: v('c-hours'), share: v('c-share') / 100, seats: v('c-seats'), casesPerWeek: v('c-cases'), tokensIn: v('c-tin'), tokensOut: v('c-tout'), years: v('c-years') });
-  if (!r.ok) { $('c-head').textContent = 'Check the inputs: ' + r.why + '.'; return; }
+  if (!r.ok) { clearCost('Check the inputs: ' + r.why + '.'); return; }
   const n = r.inputs.years, yrs = n + (n === 1 ? ' year' : ' years');
   $('c-overh').textContent = 'Over ' + yrs;
   $('c-head').textContent = '';
@@ -183,6 +223,7 @@ if (basis) {
   const readOn = (k) => { try { if (!basis[k].source) return ''; const d = dateIn(basis[k].via) || checked; return d ? ' (read ' + d + ')' : ''; } catch { return ''; } };
   $('c-src').append(...M.sourcesOf(basis).map((s) => el('li', {}, s.what || '', s.source ? ' — ' : '', s.source ? el('a', { href: s.source, target: '_blank', rel: 'noopener' }, new URL(s.source).hostname) : '', readOn(s.key))));
   if (typeof basis.currency === 'string') $('c-src').append(el('li', {}, 'Currency: ' + basis.currency + '.'));
+  $('c-src').append(el('li', {}, 'Each figure is quoted as the sourced basis words it: the same basis serves other estate products. This kit uses the laptop’s extra draw only as an upper bound for running the feed, which itself takes a moment of processor time per line.'));
 }
 for (const id of Object.keys(inputs)) $(id).addEventListener('input', renderCost);
 renderCost();
@@ -193,7 +234,7 @@ if (walks && Array.isArray(walks.walks)) {
   for (const w of walks.walks) {
     for (const g of Array.isArray(w.gaps) ? w.gaps : []) {
       const what = g.status === 'fixed' ? el('span', {}, el('span', { class: 'ok' }, 'fixed · '), g.change || '') : el('span', {}, el('span', { class: 'flag' }, (g.status || '') + ' · '), g.change || g.decision || '');
-      tb.append(el('tr', {}, el('td', {}, el('b', {}, w.persona || '')), el('td', {}, g.asked || ''), el('td', {}, what)));
+      tb.append(el('tr', {}, el('td', {}, el('b', {}, w.persona || ''), el('div', { class: 'mut' }, 'round ' + (Number.isInteger(w.round) ? w.round : 1))), el('td', {}, g.asked || ''), el('td', {}, what)));
     }
   }
 }

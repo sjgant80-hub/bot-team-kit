@@ -3,21 +3,24 @@
 **Live page: https://sjgant80-hub.github.io/bot-team-kit/** — what it is, start here (with the real kernel running in
 your browser), how it works traced from a real run, the blueprint, adoption, the white paper and the brochure.
 
-**One shared feed for a team of AI bots overseen by a person.** Every bot writes what it did to one append-only file; a
-writer strips secrets from every string (at any depth) and flags an unproven "done" *before* anything reaches disk; a
-deterministic morning rollup puts **NEEDS SIMON** at the top and can be neither forged by a line break nor leak a secret
-another tool wrote. MIT, Node.js, no dependencies, no network.
+**One shared feed for a team of AI bots overseen by a person.** Every bot writes what it did to one file the kit only
+appends to; a writer strips every secret shape it has a rule for from every string (at any depth) and flags an
+unproven "done" *before* anything reaches disk; a deterministic morning rollup puts **NEEDS SIMON** at the top and can
+be neither forged by a line break nor leak a known secret shape another tool wrote. MIT, Node.js, no dependencies, no
+network.
 
 Powered by the Konomi architecture, created by Thomas Frumkin. Supplied by
 [AI Native Solutions](https://www.ai-nativesolutions.com).
 
 ## Proof — re-run it, don't take our word
 ```bash
-node --test test/*.test.mjs test/test.mjs   # every suite
+npm run check                               # all of the below, in this order
+node --test test/*.test.mjs test/test.mjs   # every suite (npm test)
 node gate.mjs                               # the kit's curated mutation gate (its list may grow, never shrink)
-node tools/measure.mjs --check              # the sealed claims re-derive from the sealed batteries
+node tools/measure.mjs --check              # the battery claims re-derive from the sealed batteries
 node tools/trace.mjs --check                # the traced run on the page re-derives
 node tools/page-check.mjs                   # the page carries no typed-in number, no price, the credits, every section
+node tools/claims.mjs --check               # every claim the seal names has its verdict, against the seal's own bar
 ```
 CI (`.github/workflows/ci.yml`) runs all of these on GitHub's runner on every push, plus
 [witness](https://github.com/sjgant80-hub/witness) **v0.6** (pinned tag) on every organ — clean or the job fails — and
@@ -25,6 +28,7 @@ on the first build's kernel for the before-picture. The counts live in the recei
 
 | receipt | what it holds |
 |---|---|
+| [`receipts/claims.json`](receipts/claims.json) | every claim CLAIMS-1b seals, with its verdict against the seal's own bar and where it is measured |
 | [`receipts/step1b.json`](receipts/step1b.json) | CLAIMS-1b's L, F and R claims, measured once against the first build (read from git) and the code now |
 | [`receipts/witness.json`](receipts/witness.json) | tests, the curated gate (G2), witness on every organ (G1) and on the first build's kernel (G0) |
 | [`receipts/trace.json`](receipts/trace.json) | one real run through `append()` and `buildRollup()`, fixed clock (T1) |
@@ -45,7 +49,7 @@ The claims were sealed before the code that measures them: [`CLAIMS-1b.md`](CLAI
 | `test/` | the first build's suite, the kernel suite, the I/O suite (temp folders only), the cost case, the pins, the page check. |
 | `skills/feed-write/SKILL.md` | the skill a bot loads to write the feed; pinned to the kernel's SHA-256 (`test/pins.test.mjs`). |
 | `page/` · `index.html` | the live page; every number on it comes from the receipts (`page/facts.mjs`) or a kernel. |
-| `tools/` | measure, trace, gates and page-check — each with a `--check` mode CI runs. |
+| `tools/` | measure, trace, gates, page-check and claims — each with a `--check` mode CI runs. |
 
 ## The feed line
 ```json

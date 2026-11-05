@@ -3,7 +3,7 @@
 // a name the page uses is missing here or the prose carries a digit. Pure and total: a missing or broken receipt gives
 // '—' for the facts it would have supplied, never a throw.
 //   receipts = { step1b: receipts/step1b.json, witness: receipts/witness.json, trace: receipts/trace.json,
-//                walks: data/persona-walks.json }
+//                walks: data/persona-walks.json, claims: receipts/claims.json }
 
 const pick = (o, path) => { try { return path.split('.').reduce((v, k) => (v == null ? undefined : v[k]), o); } catch { return undefined; } };
 const claim = (step1b, id) => { try { return step1b.claims.find((c) => c.id === id) || {}; } catch { return {}; } };
@@ -16,10 +16,12 @@ export function facts(receipts) {
   const m = (id, path) => pick(claim(s, id).measured, path);
   const ow = (file, k) => pick(organ(w, file).witness, k);
   const out = {
-    // the claims, as measured once
-    claimsHeld: pick(s, 'summary.held'),
-    claimsFailed: pick(s, 'summary.failed'),
-    claimsRecorded: pick(s, 'summary.recorded'),
+    // every claim the seal names, with its verdict (receipts/claims.json)
+    claimsSealed: pick(r.claims, 'summary.sealed'),
+    claimsHeld: pick(r.claims, 'summary.held'),
+    claimsFailed: pick(r.claims, 'summary.failed'),
+    claimsRecorded: pick(r.claims, 'summary.recorded'),
+    // the L, F and R claims, as measured once (receipts/step1b.json)
     leakShapes: m('L1', 'step1.items'),
     leaksStep1: m('L1', 'step1.leaked'),
     leaksNow: m('L2', 'now.leaked'),
@@ -71,6 +73,7 @@ export function facts(receipts) {
   const gaps = wk ? wk.flatMap((x) => (Array.isArray(x && x.gaps) ? x.gaps : [])) : null;
   const status = (st) => (gaps ? gaps.filter((g) => g && g.status === st).length : undefined);
   out.walks = wk ? wk.length : undefined;
+  out.walkRounds = wk ? new Set(wk.map((x) => (x && Number.isInteger(x.round) ? x.round : 1))).size : undefined;
   out.walkGaps = gaps ? gaps.length : undefined;
   out.walkFixed = status('fixed');
   out.walkNeedsSimon = status('needs Simon');

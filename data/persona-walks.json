@@ -1,8 +1,12 @@
 {
-  "about": "CLAIMS-1b W1: four buyer walks of the served page. Each buyer read https://sjgant80-hub.github.io/bot-team-kit/ cold, as GitHub Pages served it at the commit below, in a browser: every control clicked (write, paste a secret, claim done, load the traced run, clear, every cost-case box, including emptied and non-numeric ones), every explainer and number read, every link opened. A gap is something the buyer needed that the page did not answer; each is fixed on the page or marked as needing a decision only the owner can make. What a buyer checked and found already answered is kept beside the gaps. The page reads this file to show the walks.",
+  "about": "CLAIMS-1b W1: four buyer walks of the served page. Each buyer read https://sjgant80-hub.github.io/bot-team-kit/ cold, as GitHub Pages served it at the commit below, in a browser: every control clicked (write, paste a secret, claim done, load the traced run, clear, every cost-case box, including emptied and non-numeric ones), every explainer and number read, every link opened. A gap is something the buyer needed that the page did not answer; each is fixed on the page or marked as needing a decision only the owner can make. What a buyer checked and found already answered is kept beside the gaps. The page reads this file to show the walks. Round 2: the same four buyers read the page again, cold, as served at round 2's commit (after round 1's fixes), with the seal and the code open beside it; round 1's record is kept as it was, and walks with no round are round 1.",
   "walker": "Kar (Claude Opus 5.5), one buyer at a time",
   "date": "2026-11-05",
   "page": { "url": "https://sjgant80-hub.github.io/bot-team-kit/", "commit": "4e1b56e842eb3743e600a341b4de6ac9ee04291b" },
+  "rounds": [
+    { "round": 1, "date": "2026-11-05", "commit": "4e1b56e842eb3743e600a341b4de6ac9ee04291b" },
+    { "round": 2, "date": "2026-11-05", "commit": "ebaddeff656e44993b9fb327e9c201b0a06bf68c", "walker": "Kar (Claude Opus 5.5), resuming after a cut-off session" }
+  ],
   "walks": [
     {
       "persona": "CFO",
@@ -68,6 +72,62 @@
         "supplier named and linked",
         "support, service levels, warranty and liability agreed per deployment",
         "exit: the feed is plain JSON lines, the code keeps running without the supplier"
+      ]
+    },
+    {
+      "round": 2,
+      "persona": "CFO",
+      "focus": "the cost case again, after round 1's fixes: every box pushed to its edges",
+      "gaps": [
+        { "asked": "I emptied the hours box. The page asked me to fill it, but the table and the board case beside it still showed the old figures.", "gap": "an input the case could not use left the previous result on screen, as if it were current", "status": "fixed", "where": "cost", "change": "When a box is empty or out of range, the table, the note and the board case are cleared and only the message stays." },
+        { "asked": "I put 150 in the percentage box and was told the share must be '0 to 1'.", "gap": "the cost kernel's own wording reached the page in the kernel's units, not the box's", "status": "fixed", "where": "cost", "change": "The page checks each box against its own range first and names the box and its range in the box's own units; it says a whole number where the case needs one." },
+        { "asked": "The electricity source is described as in-browser AI on a laptop. Is that this kit?", "gap": "the sources list quotes the shared sourced basis as written, and the page did not say why the laptop figure applies here", "status": "fixed", "where": "cost", "change": "The sources list now says each figure is quoted as the sourced basis words it, and that the kit uses the laptop's extra draw only as an upper bound for running the feed." }
+      ],
+      "alreadyAnswered": [
+        "round 1's fixes are on the served page: the boxes start at the kernel's defaults, the fortnight trial, each source's read date, GBP ex-VAT, help scoped in writing",
+        "a zero share or zero hours says there is nothing back in hours, and names the electricity cost"
+      ]
+    },
+    {
+      "round": 2,
+      "persona": "CTO / CISO",
+      "focus": "every claim on the page against the seal and the code",
+      "gaps": [
+        { "asked": "The badge says the sealed claims held. CLAIMS-1b seals more claims than the table shows: where are E1, G0, G1, G2, C1, T1, P1 and W1?", "gap": "the page showed only the claims measured in receipts/step1b.json; the rest of the seal had no verdict on the page", "status": "fixed", "where": "blueprint", "change": "receipts/claims.json, written by tools/claims.mjs and re-derived on GitHub's runner, carries the verdict of every claim the seal names, against the seal's own bar; the badge and the claims table read it." },
+        { "asked": "'Cannot leak a secret', 'secrets never reach disk' — even a shape it has no rule for?", "gap": "the opening, the adoption card and the security card promised every secret, while the risks answer says an unknown shape is stored as written", "status": "fixed", "where": "what", "change": "Each of those lines now says the secret shapes the kit has rules for, and the security card points to the measured list." },
+        { "asked": "'It cannot stop the flag' — can a bot not attach a made-up hash?", "gap": "it can: the flag checks that proof is shaped like proof, not that it is true", "status": "fixed", "where": "risks", "change": "The answer now says a bot escapes the flag only by attaching something shaped like proof, and that is exactly what the auditor re-runs." },
+        { "asked": "Where does this sit under UK GDPR?", "gap": "the page said less personal data by design, but not who is the controller, whether anyone else processes the data, or how retention and erasure work", "status": "fixed", "where": "security", "change": "A data-protection answer: the kit runs on your machine and sends nothing, so it adds no outside processor and no transfer abroad; you are the controller of what the feed holds; emails and card numbers are removed as a line is written; retention and erasure are operations on your own file, and the next morning page is rebuilt without a removed line." },
+        { "asked": "Does this page itself set cookies or track me?", "gap": "the page did not say", "status": "fixed", "where": "security", "change": "The security card now says the page sets no cookies, stores nothing in the browser and loads no analytics or outside script; its content security policy lets it load only its own files." },
+        { "asked": "Our engineer ran npm test and got one suite out of six.", "gap": "package.json's test script ran only the first build's suite, and npm run check ran none of the receipt checks", "status": "fixed", "where": "start", "change": "npm test now runs every suite and npm run check runs the whole proof list CI runs apart from witness; Start here names it." }
+      ],
+      "alreadyAnswered": [
+        "every control still works on the served page: a pasted token, email and password are redacted; a line break followed by ## NEEDS SIMON stays on one line in the rollup; an empty bot name is refused and comes back redacted",
+        "the diagram's order matches src/feed.mjs: stamp, redact, flag, validate, append",
+        "the vendored cost case, its test and its basis hash to the pins in the seal and to liveware's own files"
+      ]
+    },
+    {
+      "round": 2,
+      "persona": "COO",
+      "focus": "what goes wrong day to day",
+      "gaps": [
+        { "asked": "What if a bot simply stops writing to the feed?", "gap": "not answered", "status": "fixed", "where": "risks", "change": "A risk answer: the kit sees only what is written; each bot that wrote has its own section on the morning page, so a bot that goes quiet shows as a missing section, and work with no line in the feed is what the auditor looks for when it compares the feed with the work." }
+      ],
+      "alreadyAnswered": [
+        "round 1's fixes are on the served page: a flag never blocks a bot; one feed per machine",
+        "the page works at phone width with no sideways scroll"
+      ]
+    },
+    {
+      "round": 2,
+      "persona": "Procurement",
+      "focus": "references and straight answers",
+      "gaps": [
+        { "asked": "'Ask AI Native Solutions about deployments' — is anyone using it, yes or no?", "gap": "the answer pointed at the supplier without saying whether a reference exists", "status": "fixed", "where": "risks", "change": "Straight answer: no reference customer is named on this page and none is claimed; the receipts, and a fortnight on one of your own teams, are the evidence." }
+      ],
+      "alreadyAnswered": [
+        "the licence file is linked and the supplier's site answers",
+        "every link on the page answers, except that the Intel and Microsoft source pages refuse scripted requests (403); they were not re-opened in a browser in this round"
       ]
     }
   ]

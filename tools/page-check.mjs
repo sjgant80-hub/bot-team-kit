@@ -116,7 +116,7 @@ async function main() {
   const rd = (p) => readFileSync(join(root, p), 'utf8');
   const j = (p) => { try { return JSON.parse(rd(p)); } catch { return null; } };
   const { facts } = await import(pathToFileURL(join(root, 'page', 'facts.mjs')).href);
-  const f = facts({ step1b: j('receipts/step1b.json'), witness: j('receipts/witness.json'), trace: j('receipts/trace.json'), walks: j('data/persona-walks.json') });
+  const f = facts({ step1b: j('receipts/step1b.json'), witness: j('receipts/witness.json'), trace: j('receipts/trace.json'), walks: j('data/persona-walks.json'), claims: j('receipts/claims.json') });
   const fails = check({ html: rd('index.html'), app: rd('page/app.mjs'), facts: f, exists: (p) => existsSync(join(root, p)) });
   if (fails.length) { console.error(`P1 FAILED — ${fails.length} problem(s):\n  ` + fails.join('\n  ')); return 1; }
   const n = new Set([...rd('index.html').matchAll(/data-r="([^"]+)"/g)].map((m) => m[1])).size;

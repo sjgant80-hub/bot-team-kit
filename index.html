@@ -68,6 +68,7 @@
   svg #tip path{fill:var(--mut)} svg #tipbad path{fill:var(--bad)}
   .trace td{font-size:13.5px}
   .trace td code{font-size:12.5px}
+  .sealed{font-size:12.5px;line-height:1.45;overflow-wrap:anywhere;margin-top:3px}
   /* the brochure */
   .roles .card b{display:block;margin-bottom:4px}
   .costin{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px 14px;margin:10px 0}
@@ -95,13 +96,13 @@
 <div class="wrap">
 
   <h1>bot-team-kit</h1>
-  <p class="sub">One shared feed for a team of AI bots that a person oversees. Every bot writes what it did to the same file; secrets are stripped out and unproven "done" claims are flagged <i>before</i> anything is saved; and each morning one page — with <span class="flag">NEEDS&nbsp;SIMON</span> at the top — says what the bots did and what is waiting for a person.</p>
+  <p class="sub">One shared feed for a team of AI bots that a person oversees. Every bot writes what it did to the same file; keys, tokens, passwords, emails and card numbers are stripped out and unproven "done" claims are flagged <i>before</i> anything is saved; and each morning one page — with <span class="flag">NEEDS&nbsp;SIMON</span> at the top — says what the bots did and what is waiting for a person.</p>
   <div class="status" aria-label="live status, read from the receipts">
     <span class="pill">MIT</span>
     <span class="pill">Node.js, no dependencies</span>
     <span class="pill">tests <b><span data-r="testsPassed"></span>/<span data-r="testsTotal"></span></b> pass</span>
     <span class="pill">witness <span data-r="witnessTag"></span>: <b><span data-r="organKilled"></span>/<span data-r="organMutants"></span></b> mutants killed, <span data-r="allClean"></span></span>
-    <span class="pill">sealed claims: <b><span data-r="claimsHeld"></span></b> held, <b><span data-r="claimsFailed"></span></b> failed</span>
+    <a class="pill" href="#claims">sealed claims: <b><span data-r="claimsHeld"></span></b> held, <b><span data-r="claimsFailed"></span></b> failed, <span data-r="claimsRecorded"></span> recorded</a>
     <a class="pill" href="https://github.com/sjgant80-hub/bot-team-kit">source ↗</a>
   </div>
 
@@ -111,7 +112,7 @@
 
   <h2 id="what">What it is, in plain words</h2>
   <div class="card">
-    <p class="lede" style="margin-top:0">A small team of AI bots can only be trusted if its work is <b>checked</b>, not just produced. This kit is the one piece that makes checking possible: a <b>single shared log of every action</b>, written so that it cannot leak a secret and cannot quietly claim "done" without proof.</p>
+    <p class="lede" style="margin-top:0">A small team of AI bots can only be trusted if its work is <b>checked</b>, not just produced. This kit is the one piece that makes checking possible: a <b>single shared log of every action</b>, written so that no secret of a shape the kit has a rule for ever reaches it, and no "done" without proof passes quietly.</p>
     <p style="margin-bottom:0">A separate auditor bot and a person read that log. Anything public, paid or risky stops and waits for the person. The kit is a small kernel with a writer and a rollup around it, a schema, and a ready-made skill for the bots — it runs on the machine the bots already run on and talks to nothing else.</p>
   </div>
 
@@ -121,7 +122,7 @@
     <li><b>Try to break it.</b> Press <b>Paste a secret</b> (a token built in your browser) or <b>Claim done, no proof</b>, or type your own — a password, an email, a card number, a line break followed by <code>## NEEDS SIMON</code>.</li>
     <li><b>Read the rollup.</b> Every line you write joins a feed in this page; the box underneath is the morning page the person would read, rebuilt by the real <code>rollup()</code> each time. <b>Load the traced run</b> loads the lines from the recorded run in <a href="#how">How it works</a>.</li>
     <li><b>Run it on your own machine.</b> <code>git clone https://github.com/sjgant80-hub/bot-team-kit</code>, then <code>node src/feed.mjs --agent BUILDER --kind build --what "…" --link …</code> and <code>node src/rollup.mjs --out AGENT_FEED.md</code>.</li>
-    <li><b>Check the proof yourself.</b> <code>node --test test/*.test.mjs test/test.mjs</code>, <code>node gate.mjs</code> and <code>node tools/measure.mjs --check</code> re-derive every number on this page; GitHub's runner does the same on every change.</li>
+    <li><b>Check the proof yourself.</b> <code>npm run check</code> runs every test suite, the curated gate and the page check, and re-derives the measured claims, the traced run and the verdict of every sealed claim. The gate receipt needs witness: GitHub's runner runs it on every organ on every change and rebuilds that receipt from its own run.</li>
   </ol>
 
   <div class="card" id="tryit">
@@ -226,12 +227,13 @@
       <tr><td><code>CLAIMS-1b.md</code> + <code>data/probe-1b.json</code></td><td>The fix's claims and the batteries they are measured against, sealed in a commit before any code that measures them, and never edited after.</td></tr>
       <tr><td><code>tools/measure.mjs</code></td><td>Runs the sealed batteries against the first build's code (read from git) and the code now; writes <a href="receipts/step1b.json"><code>receipts/step1b.json</code></a>.</td></tr>
       <tr><td><code>tools/trace.mjs</code> · <code>tools/gates.mjs</code> · <code>tools/page-check.mjs</code></td><td>The traced run above; the gate receipt; and the check that this page carries no typed-in number, none of our prices, the credits and every section.</td></tr>
+      <tr><td><code>tools/claims.mjs</code></td><td>Reads the seal's own table and gives every claim in it a verdict, from the receipt or check that holds it; writes <a href="receipts/claims.json"><code>receipts/claims.json</code></a>. A sealed claim with nothing to measure it is refused, never skipped.</td></tr>
       <tr><td><code>vendor/</code></td><td>The cost case's kernel, its tests and its sourced figures, copied byte for byte from <a href="https://sjgant80-hub.github.io/liveware/">liveware</a>; a test fails if a byte changes.</td></tr>
     </tbody>
   </table></div>
 
-  <h3>The sealed claims, measured once</h3>
-  <p>The fix was sealed before it was built: what it had to show, and the test lines it would be measured on. Each claim was then measured once, against the first build and against the code now. <span data-r="claimsHeld"></span> held, <span data-r="claimsFailed"></span> failed, <span data-r="claimsRecorded"></span> was recorded only (the before-picture). A claim that fails stays failed on the record.</p>
+  <h3 id="claims">Every sealed claim, and its verdict</h3>
+  <p>The fix was sealed before it was built, in <a href="CLAIMS-1b.md"><code>CLAIMS-1b.md</code></a>: <span data-r="claimsSealed"></span> claims — what the code had to show against sealed test lines, the gates it had to pass, the traced run, the page check and the buyer walks. The battery claims were measured once, against the first build and against the code now; each other claim is held by the check the seal names. Every verdict below is read from the receipt or check that holds it, against the seal's own bar, and gathered in <a href="receipts/claims.json"><code>receipts/claims.json</code></a>, which GitHub's runner re-derives on every change: <span data-r="claimsHeld"></span> held, <span data-r="claimsFailed"></span> failed, and <span data-r="claimsRecorded"></span> are recorded only — the before-pictures. A claim that fails stays failed on the record.</p>
   <div class="scroll"><table id="claim-table"><thead><tr><th>Claim</th><th>The bar</th><th>First build</th><th>Now</th><th>Verdict</th></tr></thead><tbody></tbody></table></div>
   <p>Before and after, with the estate's mutation gate: on the first build's kernel, with the first build's tests, witness killed <span data-r="step1Killed"></span> of <span data-r="step1Mutants"></span> mutants and <span class="bad"><span data-r="step1Survived"></span> survived</span> — lines the tests did not really guard. On the fixed kernel it killed <span data-r="kernelKilled"></span> of <span data-r="kernelMutants"></span>.</p>
 
@@ -247,7 +249,7 @@
   <h2 id="adoption">Adoption — what it does for your team, and how you roll it out</h2>
   <div class="grid">
     <div class="card"><b>You run more than one AI agent.</b> You already have the questions this answers: who did what, is it true, and did anything leak. Today the answers are scattered across chat windows and terminal logs.</div>
-    <div class="card"><b>After.</b> Every agent writes to one file. The person reads one page a morning. "Done" without proof arrives flagged at the top. Keys pasted by mistake never reach the file.</div>
+    <div class="card"><b>After.</b> Every agent writes to one file. The person reads one page a morning. "Done" without proof arrives flagged at the top. A key pasted by mistake, in any shape the kit has a rule for, never reaches the file.</div>
     <div class="card"><b>What changes for people.</b> Nobody has to ask a bot what it did. The person signs off on what is waiting at the top of the page; the auditor works from the same file. A flag never blocks a bot: it puts the line in front of the person, who asks for the receipt or sends the work back.</div>
   </div>
   <h3>Roll-out</h3>
@@ -264,7 +266,7 @@
     <h3 style="margin-top:0">The problem</h3>
     <p>When several AI agents share work, things go wrong quietly. Work is claimed and not done — "shipped", "tests passed" — and nobody checks. Secrets travel: an agent pastes a key into a status message and it sits in a log for good. And the person in charge has no single place to see what happened, so oversight becomes asking each agent in turn, and believing it.</p>
     <h3>The design</h3>
-    <p><b>One feed.</b> Every action is one JSON line in one file that the kit only ever appends to, so there is one place to look and hand-offs happen in the open. <b>Clean at the door.</b> The writer strips secrets from every string in the line, at any depth, before anything touches disk — a refused line comes back redacted too. <b>Claims carry proof.</b> A line that says work is finished — a finishing word that is not negated, or a <code>build</code> or <code>receipt</code> line — must carry a receipt hash or a proof link, or it is flagged. <b>A page a person can trust.</b> The rollup prints each field on one physical line and redacts it again, so neither formatting nor a line written by another tool can forge or leak into it, and lines it cannot read are reported, not dropped. <b>A separate judge.</b> The kit checks the shape of proof; the auditor re-runs it, and anything public, paid or risky waits for the person.</p>
+    <p><b>One feed.</b> Every action is one JSON line in one file that the kit only ever appends to, so there is one place to look and hand-offs happen in the open. <b>Clean at the door.</b> The writer strips every secret shape it has a rule for from every string in the line, at any depth, before anything touches disk — a refused line comes back redacted too. <b>Claims carry proof.</b> A line that says work is finished — a finishing word that is not negated, or a <code>build</code> or <code>receipt</code> line — must carry a receipt hash or a proof link, or it is flagged. <b>A page a person can trust.</b> The rollup prints each field on one physical line and redacts it again, so neither formatting nor a line written by another tool can forge or leak into it, and lines it cannot read are reported, not dropped. <b>A separate judge.</b> The kit checks the shape of proof; the auditor re-runs it, and anything public, paid or risky waits for the person.</p>
     <h3>The evidence</h3>
     <p>Reading the first build's code found it redacted only top-level text, missed common key shapes, read a card followed by its security code as one wrong number, accepted "see above" as proof, and let a line break forge a heading. The fix was sealed before it was written. Measured once against the sealed batteries: the first build leaked <span data-r="leaksStep1"></span> of <span data-r="leakShapes"></span> secret shapes and the fixed code leaks <span data-r="leaksNow"></span>; it flagged <span data-r="claimsFlaggedStep1"></span> of <span data-r="claimLines"></span> unproven claims and now flags <span data-r="claimsFlaggedNow"></span>, while flagging <span data-r="plainFlaggedNow"></span> of <span data-r="plainLines"></span> lines that claim nothing; <span data-r="cleanUnchangedNow"></span> of <span data-r="cleanLines"></span> lines holding no secret pass through untouched; the forged rollup fails <span data-r="forgeFailedStep1"></span> of <span data-r="forgeChecks"></span> structure checks on the first build and none now. The first build's own fuzz of <span data-r="fuzzLines"></span> generated secrets still leaks none.</p>
     <h3>What it does not claim</h3>
@@ -281,7 +283,7 @@
     <div class="card"><b>CEO</b>One page a morning: what the bots did, and what is waiting for a decision. Anything public, paid or risky stops for a person, by design.</div>
     <div class="card"><b>CFO</b>The case below prices the checking work from your own hours and your own estimate of what the feed takes off. The kit calls no AI service and has no meter; it is MIT-licensed, so there is no licence fee.</div>
     <div class="card"><b>COO</b>Hand-offs happen in one file, in the open. "Done" without proof is flagged at the top, not discovered later. The same feed always produces the same page.</div>
-    <div class="card"><b>CTO / CISO</b>No network, no dependencies, no service: a few short files that read and write one local file. Secrets are stripped when a line is written and again when the page is built. Mutation-gated on GitHub's runner on every change.</div>
+    <div class="card"><b>CTO / CISO</b>No network, no dependencies, no service: a few short files that read and write one local file. Every secret shape the kit has a rule for is stripped when a line is written and again when the page is built. Mutation-gated on GitHub's runner on every change.</div>
     <div class="card"><b>Team leads</b>One command to record, one to roll up, and a ready-made skill for Claude Code, Codex or Grok. Any agent that can run Node.js can join.</div>
     <div class="card"><b>The people on the team</b>Nobody chases a bot in chat to find out what it did. The page shows who did what and what needs them.</div>
   </div>
@@ -308,9 +310,10 @@
     <div class="card" id="security"><b>Security and data protection</b>
       <ul>
         <li><b>Nothing leaves the machine.</b> The kit's code imports only Node's file, path, OS and URL helpers — no network, no child processes. A test on GitHub's runner fails if that ever changes.</li>
-        <li><b>Secrets never reach disk.</b> Every string in a line, at any depth, is redacted before it is written; a refused line is redacted too. The morning page redacts again, so a line written by any other tool cannot carry a secret into it.</li>
-        <li><b>Less personal data by design.</b> Email addresses and card numbers are removed before a line is stored, and the feed lives in a file you control, on a machine you control — no account, no database, no outside processor.</li>
+        <li><b>Known secret shapes never reach disk.</b> Every string in a line, at any depth, is redacted before it is written; a refused line is redacted too. The morning page redacts again, so a line written by any other tool cannot carry a known shape into it. A shape with no rule is stored as written — see the risks below.</li>
         <li><b>The secret shapes it removes</b> are the ones in the sealed battery, each measured: <span id="shapes" class="mut">loading…</span></li>
+        <li><b>Data protection (UK GDPR).</b> The kit runs on your machine and sends nothing anywhere, so it adds no outside processor and no transfer abroad; you are the controller of whatever the feed holds. Email addresses and card numbers are removed as a line is written — data minimisation at the door — and the feed lives in a file you control: no account, no database. Retention and erasure are operations on your own file: remove a line and the next morning page is rebuilt without it (copies you keep elsewhere are yours to remove too). Nobody at the supplier sees the feed unless a deployment's agreement gives that access.</li>
+        <li><b>This page.</b> It sets no cookies, stores nothing in your browser and loads no analytics or outside script: its content security policy lets it load only its own files. It is hosted on GitHub Pages.</li>
         <li><b>Nothing to install but Node.js.</b> No dependencies, so no supply chain to vet beyond the files themselves, which are short enough to read.</li>
       </ul>
     </div>
@@ -338,7 +341,8 @@
   <div class="card" id="risks"><b>Risks, answered straight</b>
     <dl class="risks">
       <dt>What if a secret has a shape the kit does not know?</dt><dd>It is stored as written. The kit removes the shapes its rules cover — the sealed battery lists them, and the fixed code leaks none of them. Adding a shape is one line and a test, and the morning page applies it to old lines too. The first defence is still to keep secrets out of what bots write.</dd>
-      <dt>Can a bot fake "done"?</dt><dd>It can write the words; it cannot stop the flag. A claim without a receipt hash or a proof link is flagged and goes to the top of the page. A proof link is checked for its shape, not its truth: the separate auditor re-runs it.</dd>
+      <dt>Can a bot fake "done"?</dt><dd>It can write the words, and the flag still comes: a claim without a receipt hash or a proof link is flagged and goes to the top of the page. A bot escapes the flag only by attaching something shaped like proof — and the kit checks the shape, not the truth, so that proof is exactly what the separate auditor re-runs.</dd>
+      <dt>What if a bot stops writing to the feed?</dt><dd>The kit sees only what is written. Each bot that wrote has its own section on the morning page, so a bot that goes quiet shows as a missing section — and work with no line in the feed is what the auditor looks for when it compares the feed with the work itself.</dd>
       <dt>Can a bot pretend to be another bot?</dt><dd>In this kit, yes: lines are not signed, so anything that can write the file can write any name. Formatting cannot forge the page, which is measured. For lines bound to each bot's own key, use the signed feed in ai-first-company.</dd>
       <dt>What if the feed file is damaged?</dt><dd>Lines that cannot be read are counted and reported as a blocker at the top of the page, never dropped in silence — measured on a damaged feed.</dd>
       <dt>What about personal data such as names?</dt><dd>Emails and card numbers are removed; names and free text are not. Bots should record actions, not customer records — and a rule can be added for any identifier you handle.</dd>
@@ -348,14 +352,14 @@
       <dt>What if two bots write at the same moment?</dt><dd>Each line goes to disk in one append call, and any line that ever comes back unreadable is counted and reported at the top of the page — never dropped in silence.</dd>
       <dt>Our bots run on several machines.</dt><dd>The kit keeps one feed per machine, each with its own morning page. Merging signed feeds from several machines into one is what the team feed in ai-first-company does.</dd>
       <dt>Is it certified?</dt><dd>There is nothing of ours to certify: the kit runs on your machines, under your controls, and calls no service of ours or anyone else's. What you can check is the code itself, and the receipts that prove what it does.</dd>
-      <dt>Can we talk to someone already using it?</dt><dd>Ask AI Native Solutions about deployments. The evidence on this page does not depend on anyone's word: every number is a receipt you can re-run.</dd>
+      <dt>Is anyone using it? Can we talk to a reference customer?</dt><dd>No reference customer is named on this page, and none is claimed. The evidence here does not rest on anyone's word: every number is a receipt you can re-run, and the quickest proof for your business is a fortnight on one of your own teams, comparing the hours.</dd>
       <dt>What does it need to run?</dt><dd>Node.js on the machine the agents already use. The work per line takes a moment of processor time.</dd>
     </dl>
   </div>
 
   <div class="card" id="walks"><b>Read cold by the people who would buy it</b>
-    <p style="margin:6px 0">Before this page was called finished, it was read cold, as served, by a CFO, a CTO / CISO, a COO and a procurement lead, each clicking every control and reading every number. <span data-r="walkGaps"></span> gaps were found; <span data-r="walkFixed"></span> were fixed on this page and <span data-r="walkNeedsSimon"></span> need a decision only the owner can make. The full record is <a href="data/persona-walks.json"><code>data/persona-walks.json</code></a>.</p>
-    <div class="scroll"><table id="walk-table"><thead><tr><th>Buyer</th><th>What they asked</th><th>What changed</th></tr></thead><tbody></tbody></table></div>
+    <p style="margin:6px 0">Before this page was called finished, it was read cold, as served, by a CFO, a CTO / CISO, a COO and a procurement lead, each clicking every control and reading every number — and then read again, cold, after the fixes. Over <span data-r="walkRounds"></span> rounds, <span data-r="walkGaps"></span> gaps were found; <span data-r="walkFixed"></span> were fixed on this page and <span data-r="walkNeedsSimon"></span> need a decision only the owner can make. The full record is <a href="data/persona-walks.json"><code>data/persona-walks.json</code></a>.</p>
+    <div class="scroll"><table id="walk-table"><thead><tr><th>Buyer · round</th><th>What they asked</th><th>What changed</th></tr></thead><tbody></tbody></table></div>
   </div>
 
   <div class="card board" id="board"><b>The case for your board</b><p id="c-board" style="margin-bottom:0"></p></div>

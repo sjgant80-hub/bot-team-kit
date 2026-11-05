@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: '22'
       - name: tests — the first build's suite (fuzz, flag branches, golden), the kernel, I/O, cost case, pins, page check
-        run: node --test test/test.mjs test/kernel.test.mjs test/io.test.mjs test/mintcase.test.mjs test/pins.test.mjs test/page.test.mjs
+        run: node --test test/test.mjs test/kernel.test.mjs test/io.test.mjs test/mintcase.test.mjs test/pins.test.mjs test/page.test.mjs test/claims.test.mjs
       - name: the curated mutation gate (G2) — its list may grow, never shrink
         run: node gate.mjs
       - name: witness v0.6 (pinned tag) on every organ (G1) — clean or the job fails
@@ -43,6 +43,8 @@ jobs:
         run: node tools/trace.mjs --check
       - name: the page carries no typed-in number, no price or tier wording, the credits and every section (P1)
         run: node tools/page-check.mjs
+      - name: receipts/claims.json re-derives — every claim CLAIMS-1b seals, with its verdict against the seal's own bar
+        run: node tools/claims.mjs --check
       - name: keep the witness outputs
         if: always()
         uses: actions/upload-artifact@v4

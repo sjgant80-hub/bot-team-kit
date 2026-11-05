@@ -13,8 +13,9 @@ const el = (tag, attrs, ...kids) => {
 const code = (s) => el('code', {}, s);
 const getJSON = async (p) => { try { const r = await fetch(p, { cache: 'no-cache' }); return r.ok ? await r.json() : null; } catch { return null; } };
 
-const [step1b, witness, trace, basis] = await Promise.all([
+const [step1b, witness, trace, walks, probe, basis] = await Promise.all([
   getJSON('receipts/step1b.json'), getJSON('receipts/witness.json'), getJSON('receipts/trace.json'),
+  getJSON('data/persona-walks.json'), getJSON('data/probe-1b.json'),
   getJSON('vendor/ai-first-company/vendor/sovereign-enterprise/data/basis.json'),
 ]);
 const shaOf = (file) => { try { return witness.organs.find((o) => o.file === file).sha256.slice(0, 16); } catch { return String(Date.now()); } };
@@ -24,7 +25,7 @@ const [K, M, F] = await Promise.all([
 ]);
 
 // ── the numbers in the prose ───────────────────────────────────────────────────────────────────
-const facts = F.facts({ step1b, witness, trace });
+const facts = F.facts({ step1b, witness, trace, walks });
 for (const n of document.querySelectorAll('[data-r]')) n.textContent = facts[n.dataset.r] ?? '—';
 
 // ── start here: the try-it panel, on the real kernel ───────────────────────────────────────────
@@ -94,6 +95,9 @@ $('t-trace').addEventListener('click', () => {
 });
 $('t-clear').addEventListener('click', () => { feed = []; $('t-line').textContent = ''; $('t-verdict').textContent = 'The feed is empty.'; renderRollup(); });
 renderRollup();
+
+// the secret shapes the fix was measured on, named as the sealed battery names them
+$('shapes').textContent = probe && Array.isArray(probe.leaks) ? probe.leaks.map((x) => x.shape).join(' · ') + '.' : 'see data/probe-1b.json.';
 
 // ── how it works: the traced run ───────────────────────────────────────────────────────────────
 if (trace) {
@@ -173,7 +177,23 @@ function renderCost() {
   $('c-board').textContent = 'Our AI agents’ work is checked by hand today, at about ' + gbp(r.perYear.today) + ' a year in staff time — a floor, at the UK median hourly pay. One shared feed that strips secrets and flags unproven claims, with one page each morning for the person who signs off, takes off the share we estimate: ' + gbp(r.savingPerYear) + ' a year back, ' + gbp(r.savingOver) + ' over ' + yrs + ' with inflation, for about ' + gbp(r.lines.power) + ' a year of electricity. Renting AI assistant licences instead would add ' + gbp(r.lines.seats) + ' a year and leave the checking where it is; sending every line to a cloud model instead would cost ' + gbp(r.lines.api) + ' a year in model fees and send every line outside. The kit is MIT-licensed, runs on our own machine, and every claim about it is a receipt that GitHub’s runner re-derives. The board is not asked to trust a vendor — only to read the page.';
 }
 if (basis) {
-  $('c-src').append(...M.sourcesOf(basis).map((s) => el('li', {}, s.what || '', s.source ? ' — ' : '', s.source ? el('a', { href: s.source, target: '_blank', rel: 'noopener' }, new URL(s.source).hostname) : '')));
+  // the date each figure was read: its own note, else the basis's "Checked …" date
+  const dateIn = (s) => (String(s ?? '').match(/\d{4}-\d{2}-\d{2}/) || [])[0];
+  const checked = dateIn((String(basis.about ?? '').match(/Checked (\S+)/) || [])[1]);
+  const readOn = (k) => { try { if (!basis[k].source) return ''; const d = dateIn(basis[k].via) || checked; return d ? ' (read ' + d + ')' : ''; } catch { return ''; } };
+  $('c-src').append(...M.sourcesOf(basis).map((s) => el('li', {}, s.what || '', s.source ? ' — ' : '', s.source ? el('a', { href: s.source, target: '_blank', rel: 'noopener' }, new URL(s.source).hostname) : '', readOn(s.key))));
+  if (typeof basis.currency === 'string') $('c-src').append(el('li', {}, 'Currency: ' + basis.currency + '.'));
 }
 for (const id of Object.keys(inputs)) $(id).addEventListener('input', renderCost);
 renderCost();
+
+// ── W1: the buyer walks, from data/persona-walks.json ─────────────────────────────────────────
+if (walks && Array.isArray(walks.walks)) {
+  const tb = $('walk-table').querySelector('tbody');
+  for (const w of walks.walks) {
+    for (const g of Array.isArray(w.gaps) ? w.gaps : []) {
+      const what = g.status === 'fixed' ? el('span', {}, el('span', { class: 'ok' }, 'fixed · '), g.change || '') : el('span', {}, el('span', { class: 'flag' }, (g.status || '') + ' · '), g.change || g.decision || '');
+      tb.append(el('tr', {}, el('td', {}, el('b', {}, w.persona || '')), el('td', {}, g.asked || ''), el('td', {}, what)));
+    }
+  }
+}

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>bot-team-kit — one shared feed for a team of bots</title>
 <meta name="description" content="One shared feed for a team of AI bots overseen by a person: a writer that redacts secrets and flags unproven claims before anything reaches disk, and a morning rollup with NEEDS SIMON at the top. Every claim about it is a receipt GitHub's runner re-derives. MIT.">
 <style>
@@ -116,7 +117,7 @@
 
   <h2 id="start">Start here</h2>
   <ol>
-    <li><b>Write a line in your browser.</b> The panel below runs the kit's real, gated code (<code>src/kernel.mjs</code>) in this page. Type what a bot did and press <b>Write the line</b>: you see exactly what would be saved, whether it is flagged, and whether it is refused.</li>
+    <li><b>Write a line in your browser.</b> The panel below runs the kit's real, gated code (<code>src/kernel.mjs</code>) in this page. Type what a bot did and press <b>Write the line</b>: you see exactly what would be saved, whether it is flagged, and whether it is refused. Nothing you type leaves your browser: the page can only fetch its own files.</li>
     <li><b>Try to break it.</b> Press <b>Paste a secret</b> (a token built in your browser) or <b>Claim done, no proof</b>, or type your own — a password, an email, a card number, a line break followed by <code>## NEEDS SIMON</code>.</li>
     <li><b>Read the rollup.</b> Every line you write joins a feed in this page; the box underneath is the morning page the person would read, rebuilt by the real <code>rollup()</code> each time. <b>Load the traced run</b> loads the lines from the recorded run in <a href="#how">How it works</a>.</li>
     <li><b>Run it on your own machine.</b> <code>git clone https://github.com/sjgant80-hub/bot-team-kit</code>, then <code>node src/feed.mjs --agent BUILDER --kind build --what "…" --link …</code> and <code>node src/rollup.mjs --out AGENT_FEED.md</code>.</li>
@@ -247,11 +248,11 @@
   <div class="grid">
     <div class="card"><b>You run more than one AI agent.</b> You already have the questions this answers: who did what, is it true, and did anything leak. Today the answers are scattered across chat windows and terminal logs.</div>
     <div class="card"><b>After.</b> Every agent writes to one file. The person reads one page a morning. "Done" without proof arrives flagged at the top. Keys pasted by mistake never reach the file.</div>
-    <div class="card"><b>What changes for people.</b> Nobody has to ask a bot what it did. The person signs off on what is waiting at the top of the page; the auditor works from the same file.</div>
+    <div class="card"><b>What changes for people.</b> Nobody has to ask a bot what it did. The person signs off on what is waiting at the top of the page; the auditor works from the same file. A flag never blocks a bot: it puts the line in front of the person, who asks for the receipt or sends the work back.</div>
   </div>
   <h3>Roll-out</h3>
   <ol>
-    <li><b>Pick where the feed lives</b> — a folder on the machine the bots run on. Set <code>BOT_TEAM_FEED</code> to its path, or pass <code>--feed</code>.</li>
+    <li><b>Pick where the feed lives</b> — a folder on the machine the bots run on, readable only by the bots' account and whoever audits them. Set <code>BOT_TEAM_FEED</code> to its path, or pass <code>--feed</code>.</li>
     <li><b>Give every bot one instruction:</b> record each action through <code>src/feed.mjs</code> (the command line, or <code>import { append }</code>). <code>skills/feed-write/SKILL.md</code> is that instruction, ready to load.</li>
     <li><b>Schedule the rollup</b> each morning: <code>node src/rollup.mjs --out AGENT_FEED.md</code>.</li>
     <li><b>Put a separate auditor on NEEDS SIMON</b> — a bot or a person that re-runs each receipt before anything moves.</li>
@@ -263,7 +264,7 @@
     <h3 style="margin-top:0">The problem</h3>
     <p>When several AI agents share work, things go wrong quietly. Work is claimed and not done — "shipped", "tests passed" — and nobody checks. Secrets travel: an agent pastes a key into a status message and it sits in a log for good. And the person in charge has no single place to see what happened, so oversight becomes asking each agent in turn, and believing it.</p>
     <h3>The design</h3>
-    <p><b>One feed.</b> Every action is one JSON line in one append-only file, so there is one place to look and hand-offs happen in the open. <b>Clean at the door.</b> The writer strips secrets from every string in the line, at any depth, before anything touches disk — a refused line comes back redacted too. <b>Claims carry proof.</b> A line that says work is finished — a finishing word that is not negated, or a <code>build</code> or <code>receipt</code> line — must carry a receipt hash or a proof link, or it is flagged. <b>A page a person can trust.</b> The rollup prints each field on one physical line and redacts it again, so neither formatting nor a line written by another tool can forge or leak into it, and lines it cannot read are reported, not dropped. <b>A separate judge.</b> The kit checks the shape of proof; the auditor re-runs it, and anything public, paid or risky waits for the person.</p>
+    <p><b>One feed.</b> Every action is one JSON line in one file that the kit only ever appends to, so there is one place to look and hand-offs happen in the open. <b>Clean at the door.</b> The writer strips secrets from every string in the line, at any depth, before anything touches disk — a refused line comes back redacted too. <b>Claims carry proof.</b> A line that says work is finished — a finishing word that is not negated, or a <code>build</code> or <code>receipt</code> line — must carry a receipt hash or a proof link, or it is flagged. <b>A page a person can trust.</b> The rollup prints each field on one physical line and redacts it again, so neither formatting nor a line written by another tool can forge or leak into it, and lines it cannot read are reported, not dropped. <b>A separate judge.</b> The kit checks the shape of proof; the auditor re-runs it, and anything public, paid or risky waits for the person.</p>
     <h3>The evidence</h3>
     <p>Reading the first build's code found it redacted only top-level text, missed common key shapes, read a card followed by its security code as one wrong number, accepted "see above" as proof, and let a line break forge a heading. The fix was sealed before it was written. Measured once against the sealed batteries: the first build leaked <span data-r="leaksStep1"></span> of <span data-r="leakShapes"></span> secret shapes and the fixed code leaks <span data-r="leaksNow"></span>; it flagged <span data-r="claimsFlaggedStep1"></span> of <span data-r="claimLines"></span> unproven claims and now flags <span data-r="claimsFlaggedNow"></span>, while flagging <span data-r="plainFlaggedNow"></span> of <span data-r="plainLines"></span> lines that claim nothing; <span data-r="cleanUnchangedNow"></span> of <span data-r="cleanLines"></span> lines holding no secret pass through untouched; the forged rollup fails <span data-r="forgeFailedStep1"></span> of <span data-r="forgeChecks"></span> structure checks on the first build and none now. The first build's own fuzz of <span data-r="fuzzLines"></span> generated secrets still leaks none.</p>
     <h3>What it does not claim</h3>
@@ -287,10 +288,10 @@
 
   <h3 id="cost">What the oversight costs you now — and what owning it costs</h3>
   <div class="card">
-    <p class="mut" style="margin-top:0">Your numbers, a published method. The work: the hours someone spends each week finding out what the bots did, checking whether "done" is true, and writing the status up. Staff time is priced at the UK median hourly pay with no employer on-costs — a floor, not a top end — and inflation is applied to every later year. Every outside figure comes from its published source, listed below. Computed in your browser by <code>src/mintcase.mjs</code>, a gated kernel vendored byte for byte from liveware (witness killed <span data-r="costKilled"></span> of <span data-r="costMutants"></span> of its mutants here). Change any input.</p>
+    <p class="mut" style="margin-top:0">Your numbers, a published method. The work: the hours someone spends each week finding out what the bots did, checking whether "done" is true, and writing the status up. Staff time is priced at the UK median hourly pay with no employer on-costs — a floor, not a top end — and inflation is applied to every later year. Every outside figure comes from its published source, listed below. The boxes start at the cost-case kernel's own defaults, not at a measurement of your team: put in yours. Computed in your browser by <code>src/mintcase.mjs</code>, a gated kernel vendored byte for byte from liveware (witness killed <span data-r="costKilled"></span> of <span data-r="costMutants"></span> of its mutants here). Change any input.</p>
     <div class="costin">
       <label>Hours a week spent checking on the bots <input id="c-hours" type="number" min="0" max="168" step="1"></label>
-      <label>Share of that work the feed takes off, % <input id="c-share" type="number" min="0" max="100" step="5"><small>your estimate</small></label>
+      <label>Share of that work the feed takes off, % <input id="c-share" type="number" min="0" max="100" step="5"><small>your estimate — run it on one team for a fortnight and compare the hours</small></label>
       <label>People who would get a rented AI assistant instead <input id="c-seats" type="number" min="0" max="10000" step="1"></label>
       <label>Feed lines a week <input id="c-cases" type="number" min="0" max="10000000" step="50"><small>what a cloud model would have to read</small></label>
       <label>Tokens a cloud model reads per line <input id="c-tin" type="number" min="0" max="1000000" step="100"><small>the line plus its instructions</small></label>
@@ -309,13 +310,15 @@
         <li><b>Nothing leaves the machine.</b> The kit's code imports only Node's file, path, OS and URL helpers — no network, no child processes. A test on GitHub's runner fails if that ever changes.</li>
         <li><b>Secrets never reach disk.</b> Every string in a line, at any depth, is redacted before it is written; a refused line is redacted too. The morning page redacts again, so a line written by any other tool cannot carry a secret into it.</li>
         <li><b>Less personal data by design.</b> Email addresses and card numbers are removed before a line is stored, and the feed lives in a file you control, on a machine you control — no account, no database, no outside processor.</li>
+        <li><b>The secret shapes it removes</b> are the ones in the sealed battery, each measured: <span id="shapes" class="mut">loading…</span></li>
         <li><b>Nothing to install but Node.js.</b> No dependencies, so no supply chain to vet beyond the files themselves, which are short enough to read.</li>
       </ul>
     </div>
     <div class="card" id="ownership"><b>Ownership, support and exit</b>
       <ul>
         <li><b>Supplied by <a href="https://www.ai-nativesolutions.com">AI Native Solutions</a></b> — start a conversation there.</li>
-        <li><b>You own what you run.</b> The code is MIT: no licence fee, no lock-in, and it keeps running without us.</li>
+        <li><b>You own what you run.</b> The code is <a href="LICENSE">MIT</a>: no licence fee, no lock-in, and it keeps running without us.</li>
+        <li><b>Help is scoped in writing.</b> If you want help to roll it out, or support afterwards, its scope and fee are written into that deployment's agreement before any work — and so is any access to your machines or data, which nobody has otherwise.</li>
         <li><b>Support, service levels, warranty and liability</b> are agreed per deployment, in that deployment's agreement.</li>
         <li><b>Exit is a file.</b> The feed is plain JSON lines that any tool reads; stop using the kit and the record stays yours.</li>
       </ul>
@@ -341,8 +344,18 @@
       <dt>What about personal data such as names?</dt><dd>Emails and card numbers are removed; names and free text are not. Bots should record actions, not customer records — and a rule can be added for any identifier you handle.</dd>
       <dt>Is it tied to one AI vendor?</dt><dd>No. Any agent that can run Node.js — or append one JSON line — can use it, and the page reads the same whichever model wrote the lines.</dd>
       <dt>Who checked the checks?</dt><dd>The mutation gate: witness broke every organ one operator at a time and the tests caught every broken copy, on GitHub's runner. The test batteries were written after reading the code and say so; the gate is the independent check that the tests bite.</dd>
+      <dt>Could someone edit or reorder the feed file itself?</dt><dd>The kit only appends; it does not lock or sign the file, so protect it as you would any log — with the machine's file permissions. Where you need tamper evidence, the signed team feed in ai-first-company chains and signs every line.</dd>
+      <dt>What if two bots write at the same moment?</dt><dd>Each line goes to disk in one append call, and any line that ever comes back unreadable is counted and reported at the top of the page — never dropped in silence.</dd>
+      <dt>Our bots run on several machines.</dt><dd>The kit keeps one feed per machine, each with its own morning page. Merging signed feeds from several machines into one is what the team feed in ai-first-company does.</dd>
+      <dt>Is it certified?</dt><dd>There is nothing of ours to certify: the kit runs on your machines, under your controls, and calls no service of ours or anyone else's. What you can check is the code itself, and the receipts that prove what it does.</dd>
+      <dt>Can we talk to someone already using it?</dt><dd>Ask AI Native Solutions about deployments. The evidence on this page does not depend on anyone's word: every number is a receipt you can re-run.</dd>
       <dt>What does it need to run?</dt><dd>Node.js on the machine the agents already use. The work per line takes a moment of processor time.</dd>
     </dl>
+  </div>
+
+  <div class="card" id="walks"><b>Read cold by the people who would buy it</b>
+    <p style="margin:6px 0">Before this page was called finished, it was read cold, as served, by a CFO, a CTO / CISO, a COO and a procurement lead, each clicking every control and reading every number. <span data-r="walkGaps"></span> gaps were found; <span data-r="walkFixed"></span> were fixed on this page and <span data-r="walkNeedsSimon"></span> need a decision only the owner can make. The full record is <a href="data/persona-walks.json"><code>data/persona-walks.json</code></a>.</p>
+    <div class="scroll"><table id="walk-table"><thead><tr><th>Buyer</th><th>What they asked</th><th>What changed</th></tr></thead><tbody></tbody></table></div>
   </div>
 
   <div class="card board" id="board"><b>The case for your board</b><p id="c-board" style="margin-bottom:0"></p></div>

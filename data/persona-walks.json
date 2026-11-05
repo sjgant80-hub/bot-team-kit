@@ -1,0 +1,74 @@
+{
+  "about": "CLAIMS-1b W1: four buyer walks of the served page. Each buyer read https://sjgant80-hub.github.io/bot-team-kit/ cold, as GitHub Pages served it at the commit below, in a browser: every control clicked (write, paste a secret, claim done, load the traced run, clear, every cost-case box, including emptied and non-numeric ones), every explainer and number read, every link opened. A gap is something the buyer needed that the page did not answer; each is fixed on the page or marked as needing a decision only the owner can make. What a buyer checked and found already answered is kept beside the gaps. The page reads this file to show the walks.",
+  "walker": "Kar (Claude Opus 5.5), one buyer at a time",
+  "date": "2026-11-05",
+  "page": { "url": "https://sjgant80-hub.github.io/bot-team-kit/", "commit": "4e1b56e842eb3743e600a341b4de6ac9ee04291b" },
+  "walks": [
+    {
+      "persona": "CFO",
+      "focus": "what it costs, what it saves, where every figure comes from",
+      "gaps": [
+        { "asked": "What does it cost us to get this deployed and supported?", "gap": "the page said support is agreed per deployment, but not whether help is charged or how it is agreed", "status": "fixed", "where": "ownership", "change": "Help is scoped in writing: the scope and fee of any roll-out help or support are written into the deployment's agreement before any work." },
+        { "asked": "And what will that fee be?", "gap": "no fee is stated; by the estate's standing rule no price of ours goes on a product page", "status": "needs Simon", "where": "ownership", "decision": "Simon sets the scope and fee of roll-out help and support for each deployment, in its agreement; it stays off the page." },
+        { "asked": "Where does the starting number of hours come from?", "gap": "the boxes start at values the page did not explain", "status": "fixed", "where": "cost", "change": "The page says the boxes start at the cost-case kernel's own defaults, not at a measurement of your team." },
+        { "asked": "How would we know the share of the work it takes off?", "gap": "the share was marked as an estimate with no way to firm it up", "status": "fixed", "where": "cost", "change": "The share box now says: run it on one team for a fortnight and compare the hours." },
+        { "asked": "When were the outside prices read, and is VAT in or out?", "gap": "the sources list named each source but not when it was read, nor the currency basis", "status": "fixed", "where": "cost", "change": "Each source now shows the date it was read, from the sourced basis itself, and the list ends with the currency basis (GBP, ex-VAT)." }
+      ],
+      "alreadyAnswered": [
+        "an emptied box asks for every box to be filled; a zero saving is said plainly, never shown as a negative",
+        "the electricity line is explained as an always-on laptop's extra draw, more than the kit needs",
+        "the rented-assistant route keeps the staff time; the cloud route takes the same share off and sends every line out",
+        "no licence fee (MIT), no meter, no AI service called"
+      ]
+    },
+    {
+      "persona": "CTO / CISO",
+      "focus": "where data goes, what is redacted, what could be tampered with",
+      "gaps": [
+        { "asked": "Does the try-it panel send what I type anywhere?", "gap": "the panel did not say", "status": "fixed", "where": "start", "change": "Start here now says nothing you type leaves your browser: the page can only fetch its own files." },
+        { "asked": "Can the page itself load or send anything else?", "gap": "the page had no content security policy", "status": "fixed", "where": "security", "change": "The page now carries a content security policy: scripts, fetches and styles from its own origin only, no objects, no forms, no base changes." },
+        { "asked": "Which secret shapes, exactly?", "gap": "the page pointed at the sealed battery without naming the shapes", "status": "fixed", "where": "security", "change": "Security now lists every shape the fix was measured on, read from the sealed battery." },
+        { "asked": "Is the file really append-only? Could someone edit it?", "gap": "the white paper called the file append-only, which the kit does not enforce", "status": "fixed", "where": "paper", "change": "The white paper now says the kit only ever appends to the file, and a new risk answer says to protect it with file permissions, and to use the signed team feed for tamper evidence." },
+        { "asked": "Who can read the feed?", "gap": "the roll-out did not say who should have access", "status": "fixed", "where": "adoption", "change": "Roll-out step one now says: readable only by the bots' account and whoever audits them." },
+        { "asked": "What if two bots write at the same moment?", "gap": "not answered", "status": "fixed", "where": "risks", "change": "A risk answer: each line goes to disk in one append call, and any line that comes back unreadable is counted and reported, never dropped." }
+      ],
+      "alreadyAnswered": [
+        "no network and no child processes, held by a test on GitHub's runner (E1)",
+        "no dependencies",
+        "redaction at write and again at read",
+        "mutation-gated on GitHub's runner, receipts re-derived on every change",
+        "lines are not signed here, said plainly, with the signed feed named"
+      ]
+    },
+    {
+      "persona": "COO",
+      "focus": "what changes day to day, and how it rolls out",
+      "gaps": [
+        { "asked": "When a line is flagged, does the bot stop?", "gap": "the page did not say what a flag does to the work", "status": "fixed", "where": "adoption", "change": "Adoption now says a flag never blocks a bot: it puts the line in front of the person, who asks for the receipt or sends the work back." },
+        { "asked": "Our bots run on more than one machine.", "gap": "not answered", "status": "fixed", "where": "risks", "change": "A risk answer: one feed per machine, each with its own morning page; merging signed feeds from several machines is what the team feed in ai-first-company does." },
+        { "asked": "How long does a roll-out take, and who does it?", "gap": "no timetable or staffing is stated, and none can be typed in without a deployment to measure", "status": "needs Simon", "where": "rollout", "decision": "Simon states how AI Native Solutions times and staffs a roll-out, or confirms it stays agreed per deployment." }
+      ],
+      "alreadyAnswered": [
+        "the roll-out steps and what is needed from the buyer",
+        "what the morning page looks like, from the traced run",
+        "the same feed always produces the same page"
+      ]
+    },
+    {
+      "persona": "Procurement",
+      "focus": "supplier, licence, terms, data access, exit",
+      "gaps": [
+        { "asked": "Where is the licence?", "gap": "MIT was named but not linked", "status": "fixed", "where": "ownership", "change": "MIT now links the licence file." },
+        { "asked": "Will the supplier need access to our machines or data?", "gap": "not answered", "status": "fixed", "where": "ownership", "change": "Any access to your machines or data is written into the deployment's agreement before any work, and nobody has it otherwise." },
+        { "asked": "Is it certified?", "gap": "not answered", "status": "fixed", "where": "risks", "change": "A risk answer: there is nothing of ours to certify; the kit runs on your machines and calls no service; the code and the receipts are what you check." },
+        { "asked": "Can we speak to someone already using it?", "gap": "not answered", "status": "fixed", "where": "risks", "change": "A risk answer: ask AI Native Solutions about deployments; the evidence on the page is receipts anyone can re-run." },
+        { "asked": "Company details for supplier onboarding: registered name and number, address, a contact other than the website.", "gap": "the page names the supplier and links its site, which is all that is known here", "status": "needs Simon", "where": "ownership", "decision": "Only Simon holds AI Native Solutions' registered details; the page adds them only if he gives them." }
+      ],
+      "alreadyAnswered": [
+        "supplier named and linked",
+        "support, service levels, warranty and liability agreed per deployment",
+        "exit: the feed is plain JSON lines, the code keeps running without the supplier"
+      ]
+    }
+  ]
+}

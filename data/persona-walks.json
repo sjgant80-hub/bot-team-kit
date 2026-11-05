@@ -127,7 +127,7 @@
       ],
       "alreadyAnswered": [
         "the licence file is linked and the supplier's site answers",
-        "every link on the page answers, except that the Intel and Microsoft source pages refuse scripted requests (403); they were not re-opened in a browser in this round"
+        "every link on the page answers; the Intel and Microsoft source pages refuse scripted requests (403), so after the round they were opened in a browser: Intel's page gives the i7-1255U a Processor Base Power of 15 W, and Microsoft's (it now redirects to /en-gb/copilot/solutions/enterprise) shows £23.10 — both as the sourced basis has them"
       ]
     }
   ]

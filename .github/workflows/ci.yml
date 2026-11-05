@@ -6,10 +6,10 @@ jobs:
   test-and-gate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0   # the measurement reads the first build's code and the seal's commit from git
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
       - name: tests — the first build's suite (fuzz, flag branches, golden), the kernel, I/O, cost case, pins, page check
@@ -47,7 +47,7 @@ jobs:
         run: node tools/claims.mjs --check
       - name: keep the witness outputs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: witness-outputs
           path: /tmp/w/

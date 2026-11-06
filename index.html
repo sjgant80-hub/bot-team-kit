@@ -69,6 +69,9 @@
   .trace td{font-size:13.5px}
   .trace td code{font-size:12.5px}
   .sealed{font-size:12.5px;line-height:1.45;overflow-wrap:anywhere;margin-top:3px}
+  #organ-table td:first-child,#organ-table td:nth-child(3){white-space:nowrap}
+  #organ-table td:first-child .sealed{overflow-wrap:normal}
+  #organ-table td:nth-child(2){min-width:240px}
   /* the brochure */
   .roles .card b{display:block;margin-bottom:4px}
   .costin{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px 14px;margin:10px 0}
@@ -101,10 +104,12 @@
     <span class="pill">MIT</span>
     <span class="pill">Node.js, no dependencies</span>
     <span class="pill">tests <b><span data-r="testsPassed"></span>/<span data-r="testsTotal"></span></b> pass</span>
-    <a class="pill" href="#blueprint">witness <span data-r="witnessTag"></span>: <b><span data-r="witnessKilled"></span>/<span data-r="witnessMutants"></span></b> mutants killed, <span data-r="allClean"></span></a>
+    <a class="pill" href="#blueprint">witness <span data-r="witnessTag"></span>: <b><span data-r="witnessKilled"></span>/<span data-r="witnessMutants"></span></b> mutants killed, <span data-r="witnessBaselined"></span> exempted with a checked reason, <span data-r="allClean"></span></a>
     <a class="pill" href="#claims">sealed claims: <b><span data-r="claimsHeld"></span></b> held, <b><span data-r="claimsFailed"></span></b> failed, <span data-r="claimsRecorded"></span> recorded</a>
     <a class="pill" href="https://github.com/sjgant80-hub/bot-team-kit">source ↗</a>
   </div>
+
+  <noscript><div class="card"><b>Scripts are off, so the numbers on this page are blank.</b> Every number here is read by a script from the receipts the repository commits — nothing is typed into the page — and the try-it panel and the cost case run the kit's real code in your browser. With scripts off, read the receipts themselves: <a href="receipts/claims.json">every claim's verdict</a>, <a href="receipts/witness.json">the gates</a>, <a href="receipts/step1b.json">the batteries</a> and <a href="receipts/trace.json">the traced run</a>.</div></noscript>
 
   <nav class="toc" aria-label="sections">
     <a href="#what">What it is</a><a href="#start">Start here</a><a href="#how">How it works</a><a href="#blueprint">Blueprint</a><a href="#adoption">Adoption</a><a href="#paper">White paper</a><a href="#brochure">For business</a>
@@ -122,7 +127,7 @@
     <li><b>Try to break it.</b> Press <b>Paste a secret</b> (a token built in your browser) or <b>Claim done, no proof</b>, or type your own — a password, an email, a card number, a line break followed by <code>## NEEDS SIMON</code>.</li>
     <li><b>Read the rollup.</b> Every line you write joins a feed in this page; the box underneath is the morning page the person would read, rebuilt by the real <code>rollup()</code> each time. <b>Load the traced run</b> loads the lines from the recorded run in <a href="#how">How it works</a>.</li>
     <li><b>Run it on your own machine.</b> <code>git clone https://github.com/sjgant80-hub/bot-team-kit</code>, then <code>node src/feed.mjs --agent BUILDER --kind build --what "…" --link …</code> and <code>node src/rollup.mjs --out AGENT_FEED.md</code>.</li>
-    <li><b>Check the proof yourself.</b> <code>npm run check</code> runs every test suite, the curated gate and the page check, and re-derives the measured claims, the traced run and the verdict of every sealed claim. The gate receipt needs witness: GitHub's runner runs it on every organ on every change and rebuilds that receipt from its own run.</li>
+    <li><b>Check the proof yourself.</b> <code>npm run check</code> runs every test suite, the curated gate and the page check, and re-derives the measured claims, the traced run and the verdict of every sealed claim. The gate receipt needs witness: GitHub's runner runs it on every organ and on this page's own modules on every change, and rebuilds that receipt from its own run.</li>
   </ol>
 
   <div class="card" id="tryit">
@@ -216,7 +221,7 @@
   <pre id="trace-rollup"></pre>
 
   <h2 id="blueprint">The blueprint — organ by organ</h2>
-  <p>Each organ, what it does, the tests that hold it, and what <a href="https://github.com/sjgant80-hub/witness">witness</a> <span data-r="witnessTag"></span> found when it broke the organ on purpose — every comparison and logic operator flipped, one at a time, with the tests run against each broken copy. A broken copy the tests still pass is a hole; none survived. The last rows are this page's own modules — the one that fills in every number you read here, the one that gives every sealed claim its verdict, and the page check — gated the same way since <a href="CLAIMS-1c.md"><code>CLAIMS-1c.md</code></a>. Read from <a href="receipts/witness.json"><code>receipts/witness.json</code></a>, which CI rebuilds from its own witness run.</p>
+  <p>Each organ, what it does, the tests that hold it, and what <a href="https://github.com/sjgant80-hub/witness">witness</a> <span data-r="witnessTag"></span> found when it broke the organ on purpose — every comparison and logic operator flipped, one at a time, with the tests run against each broken copy. A broken copy the tests still pass is a hole. The one exception is a copy that behaves exactly like the original, which no test can tell apart: witness lets such a survivor be exempted only with a written reason, and it is shown in its row with that reason — here the one exemption is backed by <a href="test/equivalence-1c.mjs"><code>test/equivalence-1c.mjs</code></a>, which builds that exact broken copy and compares it with the real code on every short input, on GitHub's runner on every change. Each file's SHA-256 prefix is the version witness measured. The last rows are this page's own modules — the one that fills in every number you read here, the one that gives every sealed claim its verdict, and the page check — gated the same way since <a href="CLAIMS-1c.md"><code>CLAIMS-1c.md</code></a>. Read from <a href="receipts/witness.json"><code>receipts/witness.json</code></a>, which CI rebuilds from its own witness run.</p>
   <div class="scroll"><table id="organ-table"><thead><tr><th>Organ</th><th>What it does</th><th>Held by</th><th class="num">Mutants killed</th></tr></thead><tbody></tbody></table></div>
   <div class="scroll"><table>
     <thead><tr><th>Around the organs</th><th>What it does</th></tr></thead>
@@ -348,12 +353,14 @@
       <dt>What if the feed file is damaged?</dt><dd>Lines that cannot be read are counted and reported as a blocker at the top of the page, never dropped in silence — measured on a damaged feed.</dd>
       <dt>What about personal data such as names?</dt><dd>Emails and card numbers are removed; names and free text are not. Bots should record actions, not customer records — and a rule can be added for any identifier you handle.</dd>
       <dt>Is it tied to one AI vendor?</dt><dd>No. Any agent that can run Node.js — or append one JSON line — can use it, and the page reads the same whichever model wrote the lines.</dd>
-      <dt>Who checked the checks?</dt><dd>The mutation gate: witness broke every organ one operator at a time and the tests caught every broken copy, on GitHub's runner. The test batteries were written after reading the code and say so; the gate is the independent check that the tests bite.</dd>
+      <dt>Who checked the checks?</dt><dd>The mutation gate: witness broke every organ, and this page's own modules, one operator at a time, on GitHub's runner. The tests caught every broken copy of the organs; of the page's modules, the one copy they cannot catch behaves exactly like the original, and that is shown with its reason and checked on every change, not argued. The test batteries were written after reading the code and say so; the gate is the independent check that the tests bite.</dd>
       <dt>Could someone edit or reorder the feed file itself?</dt><dd>The kit only appends; it does not lock or sign the file, so protect it as you would any log — with the machine's file permissions. Where you need tamper evidence, the signed team feed in ai-first-company chains and signs every line.</dd>
       <dt>What if two bots write at the same moment?</dt><dd>Each line goes to disk in one append call, and any line that ever comes back unreadable is counted and reported at the top of the page — never dropped in silence.</dd>
+      <dt>Does the feed file grow forever?</dt><dd>It grows by one line per action, and the morning page reads all of it. Rotate it as you would any log: move the old file aside — keep it, it is your record — and the writer starts a new file at the same path on the next line; the morning page then covers the new file.</dd>
       <dt>Our bots run on several machines.</dt><dd>The kit keeps one feed per machine, each with its own morning page. Merging signed feeds from several machines into one is what the team feed in ai-first-company does.</dd>
       <dt>Is it certified?</dt><dd>There is nothing of ours to certify: the kit runs on your machines, under your controls, and calls no service of ours or anyone else's. What you can check is the code itself, and the receipts that prove what it does.</dd>
       <dt>Is anyone using it? Can we talk to a reference customer?</dt><dd>No reference customer is named on this page, and none is claimed. The evidence here does not rest on anyone's word: every number is a receipt you can re-run, and the quickest proof for your business is a fortnight on one of your own teams, comparing the hours.</dd>
+      <dt>Which version would we be running, and is it the one these receipts measured?</dt><dd>Adopt a fixed commit of the repository, not a moving branch. <a href="receipts/witness.json"><code>receipts/witness.json</code></a> names the SHA-256 of every file it gated — the prefixes are in the blueprint — and the sealed claims name the files they measure, so your team can hash its copy and see that it is the code these receipts were measured on.</dd>
       <dt>What does it need to run?</dt><dd>Node.js on the machine the agents already use. The work per line takes a moment of processor time.</dd>
     </dl>
   </div>

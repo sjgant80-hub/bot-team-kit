@@ -15,8 +15,8 @@
       "test/page.test.mjs",
       "test/claims.test.mjs"
     ],
-    "total": 107,
-    "passed": 107,
+    "total": 108,
+    "passed": 108,
     "failed": 0
   },
   "g2": {
@@ -211,14 +211,14 @@
   "kernels": [
     {
       "file": "page/facts.mjs",
-      "sha256": "ecfa50f3ec34b58d0557c5417422087f826c348aca897a09f74c5666ce2c82cd",
+      "sha256": "59596b1b3a175a4906a7076c639feade5dd0b8ee0d81f8b14f295e00139af75a",
       "tests": [
         "test/page.test.mjs"
       ],
       "job": "every number on the page, read from the receipts; a missing or broken receipt gives the dash",
       "witness": {
-        "total": 31,
-        "killed": 31,
+        "total": 33,
+        "killed": 33,
         "survived": 0,
         "capped": false,
         "survivors": [],

@@ -95,6 +95,10 @@ export function facts(receipts) {
   // every file witness gated on the runner: the organs and the page's modules
   out.witnessMutants = out.organMutants === undefined ? undefined : all + (out.pageMutants || 0);
   out.witnessKilled = out.organKilled === undefined ? undefined : out.organKilled + (out.pageKilled || 0);
+  // survivors exempted as equivalent, each with its written reason: counted beside "clean", never folded into it
+  const exempt = (x) => (x && Array.isArray(x.ignored) ? x.ignored.length : 0);
+  out.witnessBaselined = out.organMutants === undefined ? undefined
+    : organs.reduce((n, f) => n + exempt(pick(organ(w, f), 'witness')), 0) + now.reduce((n, x) => n + exempt(x), 0);
   out.allClean = pick(w, 'allClean') === true ? 'clean' : pick(w, 'allClean') === false ? 'not clean' : undefined;
   return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, shown(v)]));
 }

@@ -123,7 +123,8 @@ if (witness) {
       ? el('details', { class: 'sealed' }, el('summary', {}, w.ignored.length + (w.ignored.length === 1 ? ' survivor baselined' : ' survivors baselined') + ', with the reason'),
         ...w.ignored.map((x) => el('p', { class: 'mut', style: 'text-align:left;white-space:normal' }, 'line ' + x.line + ' · ', code(x.mutation), ' — ' + x.reason)))
       : '';
-    tb.append(el('tr', {}, el('td', {}, code(o.file)), el('td', {}, o.job, exempt), el('td', {}, ...o.tests.flatMap((t, i) => (i ? [el('br', {}), code(t)] : [code(t)]))), el('td', { class: 'num' }, verdict)));
+    const version = typeof o.sha256 === 'string' ? el('div', { class: 'mut sealed' }, 'sha256 ' + o.sha256.slice(0, 12) + '…') : '';
+    tb.append(el('tr', {}, el('td', {}, code(o.file), version), el('td', {}, o.job, exempt), el('td', {}, ...o.tests.flatMap((t, i) => (i ? [el('br', {}), code(t)] : [code(t)]))), el('td', { class: 'num' }, verdict)));
   }
 }
 

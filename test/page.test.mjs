@@ -204,3 +204,16 @@ test('facts · total on garbage page-module receipts too', () => {
     for (const [k, v] of Object.entries(f)) assert.ok(typeof v === 'number' || (typeof v === 'string' && v.length > 0), `${k}: ${v}`);
   }
 });
+
+test('facts · baselined survivors are counted beside clean, across the organs and the page modules', () => {
+  const files = ['src/kernel.mjs', 'src/feed.mjs', 'src/rollup.mjs', 'src/mintcase.mjs'];
+  const organs = files.map((file, i) => ({ file, witness: { total: 2, killed: 2, ignored: i === 1 ? [{ reason: 'r' }] : i === 2 ? 'x' : [] } }));
+  const kernels = [{ witness: { total: 3, killed: 2, ignored: [{ reason: 'a' }, { reason: 'b' }] } }, { witness: { total: 1, killed: 1 } }];
+  assert.equal(facts({ witness: { organs, kernels } }).witnessBaselined, 3);
+  assert.equal(facts({ witness: { organs } }).witnessBaselined, 1);
+  assert.equal(facts({ witness: { organs: organs.map((o) => ({ ...o, witness: { ...o.witness, ignored: [] } })) } }).witnessBaselined, 0);
+  assert.equal(facts({ witness: { kernels } }).witnessBaselined, '—', 'no organs ran: the dash');
+  const w = W();
+  const real = [...w.organs, ...w.kernels].reduce((n, o) => n + o.witness.ignored.length, 0);
+  assert.equal(FACTS.witnessBaselined, real);
+});

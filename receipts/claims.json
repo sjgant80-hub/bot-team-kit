@@ -184,10 +184,10 @@
       "held": true,
       "where": "data/persona-walks.json",
       "evidence": {
-        "walks": 8,
-        "rounds": 2,
-        "gaps": 30,
-        "fixed": 27,
+        "walks": 12,
+        "rounds": 3,
+        "gaps": 36,
+        "fixed": 33,
         "needsSimon": 3,
         "unanswered": 0
       }
@@ -201,8 +201,8 @@
       "where": "receipts/witness.json",
       "evidence": {
         "files": 3,
-        "killed": 158,
-        "total": 159,
+        "killed": 160,
+        "total": 161,
         "baselined": 1,
         "tag": "v0.6"
       }
@@ -239,13 +239,13 @@
       "id": "W2",
       "claim": "a third round of the four buyer walks (CFO, CTO / CISO, COO, procurement) of the page as served after this fold, kept in data/persona-walks.json beside rounds 1 and 2",
       "bar": "every buyer walked, with what each checked; every gap fixed on the page, or listed as needing Simon with the exact decision",
-      "held": false,
+      "held": true,
       "where": "data/persona-walks.json",
       "evidence": {
         "round": 3,
-        "walks": 0,
-        "gaps": 0,
-        "fixed": 0,
+        "walks": 4,
+        "gaps": 6,
+        "fixed": 6,
         "needsSimon": 0,
         "unanswered": 0
       }
@@ -253,8 +253,8 @@
   ],
   "summary": {
     "sealed": 21,
-    "held": 17,
-    "failed": 1,
+    "held": 18,
+    "failed": 0,
     "recorded": 3
   }
 }

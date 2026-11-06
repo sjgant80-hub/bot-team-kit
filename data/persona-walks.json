@@ -1,11 +1,12 @@
 {
-  "about": "CLAIMS-1b W1: four buyer walks of the served page. Each buyer read https://sjgant80-hub.github.io/bot-team-kit/ cold, as GitHub Pages served it at the commit below, in a browser: every control clicked (write, paste a secret, claim done, load the traced run, clear, every cost-case box, including emptied and non-numeric ones), every explainer and number read, every link opened. A gap is something the buyer needed that the page did not answer; each is fixed on the page or marked as needing a decision only the owner can make. What a buyer checked and found already answered is kept beside the gaps. The page reads this file to show the walks. Round 2: the same four buyers read the page again, cold, as served at round 2's commit (after round 1's fixes), with the seal and the code open beside it; round 1's record is kept as it was, and walks with no round are round 1.",
+  "about": "CLAIMS-1b W1: four buyer walks of the served page. Each buyer read https://sjgant80-hub.github.io/bot-team-kit/ cold, as GitHub Pages served it at the commit below, in a browser: every control clicked (write, paste a secret, claim done, load the traced run, clear, every cost-case box, including emptied and non-numeric ones), every explainer and number read, every link opened. A gap is something the buyer needed that the page did not answer; each is fixed on the page or marked as needing a decision only the owner can make. What a buyer checked and found already answered is kept beside the gaps. The page reads this file to show the walks. Round 2: the same four buyers read the page again, cold, as served at round 2's commit (after round 1's fixes), with the seal and the code open beside it; round 1's record is kept as it was, and walks with no round are round 1. Round 3 (CLAIMS-1c W2): the same four buyers read the page again, cold, as served at round 3's commit (after the page's own modules were mutation-gated), with every receipt open beside it; each walk lists what was checked.",
   "walker": "Kar (Claude Opus 5.5), one buyer at a time",
   "date": "2026-11-05",
   "page": { "url": "https://sjgant80-hub.github.io/bot-team-kit/", "commit": "4e1b56e842eb3743e600a341b4de6ac9ee04291b" },
   "rounds": [
     { "round": 1, "date": "2026-11-05", "commit": "4e1b56e842eb3743e600a341b4de6ac9ee04291b" },
-    { "round": 2, "date": "2026-11-05", "commit": "ebaddeff656e44993b9fb327e9c201b0a06bf68c", "walker": "Kar (Claude Opus 5.5), resuming after a cut-off session" }
+    { "round": 2, "date": "2026-11-05", "commit": "ebaddeff656e44993b9fb327e9c201b0a06bf68c", "walker": "Kar (Claude Opus 5.5), resuming after a cut-off session" },
+    { "round": 3, "date": "2026-11-06", "commit": "742fea35adfe90fe44b24a65386870a2f9ac0172", "walker": "Kar (Claude Opus 5.5), one buyer at a time, after the CLAIMS-1c fold" }
   ],
   "walks": [
     {
@@ -128,6 +129,115 @@
       "alreadyAnswered": [
         "the licence file is linked and the supplier's site answers",
         "every link on the page answers; the Intel and Microsoft source pages refuse scripted requests (403), so after the round they were opened in a browser: Intel's page gives the i7-1255U a Processor Base Power of 15 W, and Microsoft's (it now redirects to /en-gb/copilot/solutions/enterprise) shows £23.10 — both as the sourced basis has them"
+      ]
+    },
+    {
+      "round": 3,
+      "persona": "CFO",
+      "focus": "the headline numbers: what the badges say, and whether every figure still has a source",
+      "checked": [
+        "the status badges, against receipts/witness.json and receipts/claims.json",
+        "every cost-case box, including emptied and out-of-range ones; the table, the note and the board case",
+        "the sources list: each figure, its link and the date it was read, GBP ex-VAT",
+        "the walks table and its counts against data/persona-walks.json"
+      ],
+      "gaps": [
+        {
+          "asked": "The badge says 286 of 287 mutants killed, and in the same breath \"clean\". Which is it?",
+          "gap": "the badge counted one exempted survivor as not killed and still said clean, without saying that an exemption exists",
+          "status": "fixed",
+          "where": "status",
+          "change": "The badge now names the exemptions beside the count (\"exempted with a checked reason\"), read from the receipt, and links to the blueprint, where the exempted copy is shown with its reason."
+        }
+      ],
+      "alreadyAnswered": [
+        "the cost case still clears its result when a box is empty or out of range, and names the box and its range",
+        "every outside figure still carries its source and read date; none of our prices is on the page"
+      ]
+    },
+    {
+      "round": 3,
+      "persona": "CTO / CISO",
+      "focus": "the new gate on the page's own modules, and the page with scripts off",
+      "checked": [
+        "the blueprint rows for page/facts.mjs, tools/verdicts.mjs and tools/page-rules.mjs against receipts/witness.json",
+        "the exempted survivor's reason, against tools/witness.baseline.json and test/equivalence-1c.mjs",
+        "the CLAIMS-1c rows of the claims table against CLAIMS-1c.md and receipts/claims.json",
+        "the page text as it reads before its script runs, which is what a reader with scripts blocked sees",
+        "the content security policy and the security card"
+      ],
+      "gaps": [
+        {
+          "asked": "The blueprint says \"none survived\", and one row says a survivor was baselined. Which is true?",
+          "gap": "the paragraph above the table was written before any exemption existed and contradicted the row",
+          "status": "fixed",
+          "where": "blueprint",
+          "change": "The paragraph now says a broken copy the tests pass is a hole, except one that behaves exactly like the original; such a survivor is exempted only with a written reason, shown in its row, and backed by test/equivalence-1c.mjs, which GitHub's runner runs on every change."
+        },
+        {
+          "asked": "Read before its script runs, as a reader with scripts blocked would see it, every number on the page is blank, with no word why.",
+          "gap": "the page fills every number from the receipts with a script, and said nothing when scripts were off",
+          "status": "fixed",
+          "where": "top of the page",
+          "change": "A notice for readers with scripts off says why the numbers are blank and links the four receipts to read instead."
+        },
+        {
+          "asked": "\"Who checked the checks?\" says the tests caught every broken copy. Is that still so?",
+          "gap": "the risk answer described the organs only, and was no longer exact once the page's modules were gated with one exemption",
+          "status": "fixed",
+          "where": "risks",
+          "change": "The answer now covers the page's modules too: every broken copy of the organs caught; of the page's modules, the one copy no test can catch behaves exactly like the original, and is shown with its reason and checked on every change."
+        }
+      ],
+      "alreadyAnswered": [
+        "the baselined reason is matched by witness to the exact line, so it stops applying if that line changes",
+        "the page still loads only its own files: scripts, fetches and styles from its own origin"
+      ]
+    },
+    {
+      "round": 3,
+      "persona": "COO",
+      "focus": "running it day to day, months in",
+      "checked": [
+        "every try-it control: write, paste a secret, claim done with no proof, a forged heading, a refused line, the traced run, clear",
+        "the roll-out steps, in both places they appear",
+        "the risks list, end to end"
+      ],
+      "gaps": [
+        {
+          "asked": "After a year of bots writing, does the feed just keep growing? Do we ever rotate it?",
+          "gap": "the page said the kit only appends, but not what happens to the file over time or how to rotate it",
+          "status": "fixed",
+          "where": "risks",
+          "change": "A risk answer: it grows by one line per action and the morning page reads all of it; rotate it like any log by moving the old file aside (it is your record), and the writer starts a new one at the same path."
+        }
+      ],
+      "alreadyAnswered": [
+        "a flag never blocks a bot; one feed per machine; a quiet bot shows as a missing section",
+        "how long a roll-out takes and who does it is still the owner's to state (recorded in round 1)"
+      ]
+    },
+    {
+      "round": 3,
+      "persona": "Procurement",
+      "focus": "what exactly we would be adopting, and who stands behind it",
+      "checked": [
+        "the licence link, the supplier links and the ownership card",
+        "the footer's receipt links, each named by what it holds",
+        "the reference-customer answer and the certification answer"
+      ],
+      "gaps": [
+        {
+          "asked": "Which version would we be running, and how do we know it is the one these receipts measured?",
+          "gap": "the page named no version and gave no way to match a copy to the code the receipts measured",
+          "status": "fixed",
+          "where": "risks · blueprint",
+          "change": "A risk answer: adopt a fixed commit, not a moving branch; receipts/witness.json names the SHA-256 of every gated file, now shown as a prefix in each blueprint row, so a team can hash its copy and match it."
+        }
+      ],
+      "alreadyAnswered": [
+        "no reference customer is named or claimed; the receipts and a fortnight on one team are the evidence",
+        "the supplier's registered details are still the owner's to give (recorded in round 1)"
       ]
     }
   ]

@@ -333,8 +333,8 @@
       ],
       "witness": {
         "total": 81,
-        "killed": 50,
-        "survived": 31,
+        "killed": 51,
+        "survived": 30,
         "capped": false,
         "survivors": [
           {
@@ -411,11 +411,6 @@
             "line": 159,
             "mutation": "=== → !==",
             "snippet": "m.P1 = { held: p1.status === 0, where: 'tools/page-check.mjs', evidence: { passed: p1.stat"
-          },
-          {
-            "line": 173,
-            "mutation": "=== → !==",
-            "snippet": "const isMain = (() => { try { return pathToFileURL(realpathSync(process.argv[1])).href ==="
           },
           {
             "line": 187,

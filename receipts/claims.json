@@ -216,9 +216,9 @@
       "where": "receipts/witness.json",
       "evidence": {
         "files": 3,
-        "killed": 103,
+        "killed": 104,
         "total": 157,
-        "survived": 54
+        "survived": 53
       }
     },
     {

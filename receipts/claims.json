@@ -1,10 +1,21 @@
 {
-  "receipt": "bot-team-kit — every claim CLAIMS-1b sealed, with its verdict and where it is measured",
-  "sealedIn": "CLAIMS-1b.md",
-  "sealSha256": "949edb2842ba2c563247540b504c1c75578a58dd75a4df858430fae5560e9322",
+  "receipt": "bot-team-kit — every claim every seal names, with its verdict and where it is measured",
+  "seals": [
+    {
+      "file": "CLAIMS-1b.md",
+      "sha256": "949edb2842ba2c563247540b504c1c75578a58dd75a4df858430fae5560e9322",
+      "claims": 17
+    },
+    {
+      "file": "CLAIMS-1c.md",
+      "sha256": "dfa3934524bc797148e5ebdceef314859961bc032c2e26615facf71d4f5c751e",
+      "claims": 4
+    }
+  ],
   "reproduce": "node tools/claims.mjs --check (CI runs it after every other check)",
   "claims": [
     {
+      "seal": "CLAIMS-1b.md",
       "id": "L1",
       "claim": "the leaks battery (36 shapes) against step 1",
       "bar": "recorded only — the before-picture",
@@ -12,6 +23,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "L2",
       "claim": "the leaks battery against now",
       "bar": "0 of 36 leak",
@@ -19,6 +31,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "L3",
       "claim": "the clean battery (16 lines that hold no secret) against now: every field comes out byte-identical (flags aside)",
       "bar": "16 of 16 unchanged; step 1 recorded",
@@ -26,6 +39,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "L4",
       "claim": "step 1's 1000-line redaction fuzz (test/checks.mjs, unchanged) against now",
       "bar": "0 leaks",
@@ -33,6 +47,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "F1",
       "claim": "the claims battery (20 lines saying work is finished, no receipt, no link) against now",
       "bar": "20 of 20 flagged; step 1 recorded",
@@ -40,6 +55,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "F2",
       "claim": "the plain battery (10 lines that do not say work is finished, two of them negated) against now",
       "bar": "0 of 10 flagged; step 1 recorded",
@@ -47,6 +63,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "F3",
       "claim": "the proof battery: a 64-hex receipt, an https link or a repository path is proof; \"see above\", \"trust me\", a malformed hash or a blank link is not",
       "bar": "7 of 7 as stated; step 1 recorded",
@@ -54,6 +71,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "R1",
       "claim": "the forge lines rolled up by now: every output line is the title, a blank, ## NEEDS SIMON (exactly once), a persona heading, or an item (- [); items = lines needing Simon + all lines; the battery's secret appears nowhere",
       "bar": "all hold; step 1 recorded",
@@ -61,6 +79,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "R2",
       "claim": "the corrupt feed (2 unreadable lines among 2 good) rolled up by now",
       "bar": "NEEDS SIMON carries a blocker naming 2; step 1 recorded",
@@ -68,6 +87,7 @@
       "where": "receipts/step1b.json"
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "E1",
       "claim": "src/kernel.mjs, src/feed.mjs, src/rollup.mjs import nothing but node:fs, node:path, node:os, node:url and each other; no network, no child processes",
       "bar": "a test in CI",
@@ -79,6 +99,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "G0",
       "claim": "witness v0.6 on step 1's src/kernel.mjs with step 1's tests, on GitHub's runner",
       "bar": "recorded only",
@@ -91,6 +112,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "G1",
       "claim": "witness v0.6 (the pinned tag), cap 800, on GitHub's runner, on src/kernel.mjs, src/feed.mjs, src/rollup.mjs and src/mintcase.mjs",
       "bar": "clean on every file; any baselined survivor carries its written reason in witness.baseline.json and is shown on the page",
@@ -105,6 +127,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "G2",
       "claim": "gate.mjs (step 1's curated gate)",
       "bar": "kills every mutation it lists; its list may grow, never shrink",
@@ -118,6 +141,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "C1",
       "claim": "the cost case is liveware's gated kernel and sourced basis, vendored byte for byte: src/mintcase.mjs sha256 890be73fd6ece622ccb424e0c191c22738198a01bc177ebe5b362b9ddcb69eef, test/mintcase.test.mjs 347b15b84f84f7870b34137b2f77cc292f70047e43f326995ccbbbe428f87c63, vendor/ai-first-company/vendor/sovereign-enterprise/data/basis.json 83e9c2effa2f81596dcfa7110f030940032c1910cdf928d27d628ae59d73bb42 (liveware ee580e4)",
       "bar": "CI checks the three hashes",
@@ -131,6 +155,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "T1",
       "claim": "receipts/trace.json: one real line through the real append() and the real rollup, fixed clock",
       "bar": "CI re-derives it byte for byte",
@@ -141,6 +166,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "P1",
       "claim": "tools/page-check.mjs on index.html: no number typed into the page's prose (every count is read from receipts/ or computed by a kernel in the page), none of our prices, no tier / per-seat / crypto / earnings wording, the Konomi credit present, and the sections what-it-is, start-here, how-it-works, blueprint, adoption, white paper and the brochure present",
       "bar": "passes in CI",
@@ -151,6 +177,7 @@
       }
     },
     {
+      "seal": "CLAIMS-1b.md",
       "id": "W1",
       "claim": "four buyer walks of the served page (CFO, CTO/CISO, COO, procurement), kept in data/persona-walks.json",
       "bar": "every gap fixed on the page, or listed as needing Simon with the exact decision",
@@ -164,12 +191,70 @@
         "needsSimon": 3,
         "unanswered": 0
       }
+    },
+    {
+      "seal": "CLAIMS-1c.md",
+      "id": "G3",
+      "claim": "witness v0.6 (the pinned tag), cap 800, per-mutant timeout 30000 ms, on GitHub's runner, on page/facts.mjs (with test/page.test.mjs), tools/verdicts.mjs — the verdict half of tools/claims.mjs — (with test/claims.test.mjs) and tools/page-rules.mjs — the rule half of tools/page-check.mjs — (with test/page.test.mjs)",
+      "bar": "clean on every file, nothing capped; any baselined survivor carries its written reason in witness.baseline.json and is shown on the page",
+      "held": true,
+      "where": "receipts/witness.json",
+      "evidence": {
+        "files": 3,
+        "killed": 158,
+        "total": 159,
+        "baselined": 1,
+        "tag": "v0.6"
+      }
+    },
+    {
+      "seal": "CLAIMS-1c.md",
+      "id": "G4",
+      "claim": "witness v0.6, the same settings, on GitHub's runner, on page/facts.mjs, tools/claims.mjs and tools/page-check.mjs as at f1d8e70, with that commit's tests",
+      "bar": "recorded only — the before-picture",
+      "held": null,
+      "where": "receipts/witness.json",
+      "evidence": {
+        "files": 3,
+        "killed": 103,
+        "total": 157,
+        "survived": 54
+      }
+    },
+    {
+      "seal": "CLAIMS-1c.md",
+      "id": "V1",
+      "claim": "receipts/claims.json carries a verdict for every claim in every seal (CLAIMS-1b.md, then CLAIMS-1c.md), each against its own seal's bar, and every CLAIMS-1b verdict is the one it had at f1d8e70",
+      "bar": "CI re-derives it byte for byte; a test compares each CLAIMS-1b verdict with f1d8e70's receipt, read from git",
+      "held": true,
+      "where": "receipts/claims.json",
+      "evidence": {
+        "seals": 2,
+        "compared": 17,
+        "changed": []
+      }
+    },
+    {
+      "seal": "CLAIMS-1c.md",
+      "id": "W2",
+      "claim": "a third round of the four buyer walks (CFO, CTO / CISO, COO, procurement) of the page as served after this fold, kept in data/persona-walks.json beside rounds 1 and 2",
+      "bar": "every buyer walked, with what each checked; every gap fixed on the page, or listed as needing Simon with the exact decision",
+      "held": false,
+      "where": "data/persona-walks.json",
+      "evidence": {
+        "round": 3,
+        "walks": 0,
+        "gaps": 0,
+        "fixed": 0,
+        "needsSimon": 0,
+        "unanswered": 0
+      }
     }
   ],
   "summary": {
-    "sealed": 17,
-    "held": 15,
-    "failed": 0,
-    "recorded": 2
+    "sealed": 21,
+    "held": 17,
+    "failed": 1,
+    "recorded": 3
   }
 }

@@ -1,5 +1,5 @@
 {
-  "receipt": "bot-team-kit gates — tests, step 1’s curated gate (G2), witness v0.6 on every organ (G1) and on step 1’s kernel (G0)",
+  "receipt": "bot-team-kit gates — tests, step 1’s curated gate (G2), witness v0.6 on every organ (G1) and on step 1’s kernel (G0), on the page’s own modules (G3) and on them before CLAIMS-1c (G4)",
   "witness": {
     "repo": "https://github.com/sjgant80-hub/witness",
     "tag": "v0.6",
@@ -15,8 +15,8 @@
       "test/page.test.mjs",
       "test/claims.test.mjs"
     ],
-    "total": 92,
-    "passed": 92,
+    "total": 107,
+    "passed": 107,
     "failed": 0
   },
   "g2": {
@@ -203,6 +203,393 @@
       "clean": false
     }
   },
+  "kernelRun": {
+    "tag": "v0.6",
+    "cap": 800,
+    "timeout": 30000
+  },
+  "kernels": [
+    {
+      "file": "page/facts.mjs",
+      "sha256": "ecfa50f3ec34b58d0557c5417422087f826c348aca897a09f74c5666ce2c82cd",
+      "tests": [
+        "test/page.test.mjs"
+      ],
+      "job": "every number on the page, read from the receipts; a missing or broken receipt gives the dash",
+      "witness": {
+        "total": 31,
+        "killed": 31,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [],
+        "clean": true
+      }
+    },
+    {
+      "file": "tools/verdicts.mjs",
+      "sha256": "9120bbb262543736d9e8202e6fffb4c7908095706ccfef364936179591acedea",
+      "tests": [
+        "test/claims.test.mjs"
+      ],
+      "job": "the verdict of every sealed claim, against its own seal’s bar",
+      "witness": {
+        "total": 77,
+        "killed": 77,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [],
+        "clean": true
+      }
+    },
+    {
+      "file": "tools/page-rules.mjs",
+      "sha256": "246bf844f88137e87c49ab6613db62d2576bcda3f8cb84c67349a1e52b8f370a",
+      "tests": [
+        "test/page.test.mjs"
+      ],
+      "job": "the page check (P1): no typed-in number, no price, the credits, every section",
+      "witness": {
+        "total": 51,
+        "killed": 50,
+        "survived": 0,
+        "capped": false,
+        "survivors": [],
+        "ignored": [
+          {
+            "line": 60,
+            "mutation": "< → <=",
+            "reason": "Equivalent, and checked rather than argued. This is the outer loop bound of the code walker inside jsStrings (tools/page-rules.mjs). The mutant takes one extra iteration, entered only when i === s.length; there s[i] and s[i + 1] are both undefined, which matches none of the branch guards (each compares against a single character: '/', a quote, a backtick, '{' or '}'), so the body falls through to i++ and the loop ends. Nothing is pushed and depth is not read again. Where i jumps by more than one (a comment, a string, a template, a ${...} part) it lands on s.length — the no-op iteration above — or past it, which fails both bounds alike. test/equivalence-1c.mjs builds this exact mutant and compares it with the real rules on every string of up to six characters drawn from every character the walker branches on, plus 100,000 random longer strings and non-string inputs; CI runs it on every push, and a single difference fails the job."
+          }
+        ],
+        "clean": true
+      }
+    }
+  ],
+  "g4": [
+    {
+      "file": "page/facts.mjs",
+      "at": "f1d8e70",
+      "tests": [
+        "test/page.test.mjs"
+      ],
+      "witness": {
+        "total": 23,
+        "killed": 15,
+        "survived": 8,
+        "capped": false,
+        "survivors": [
+          {
+            "line": 11,
+            "mutation": "> → >=",
+            "snippet": "const shown = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : typeof v === 'stri"
+          },
+          {
+            "line": 82,
+            "mutation": "> → >=",
+            "snippet": "out.organMutants = all > 0 ? all : undefined;"
+          },
+          {
+            "line": 83,
+            "mutation": "> → >=",
+            "snippet": "out.organKilled = all > 0 ? organs.reduce((n, f) => n + (Number(ow(f, 'killed')) || 0), 0)"
+          },
+          {
+            "line": 74,
+            "mutation": "=== → !==",
+            "snippet": "const status = (st) => (gaps ? gaps.filter((g) => g && g.status === st).length : undefined"
+          },
+          {
+            "line": 84,
+            "mutation": "=== → !==",
+            "snippet": "out.allClean = pick(w, 'allClean') === true ? 'clean' : pick(w, 'allClean') === false ? 'n"
+          },
+          {
+            "line": 11,
+            "mutation": "&& → ||",
+            "snippet": "const shown = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : typeof v === 'stri"
+          },
+          {
+            "line": 74,
+            "mutation": "&& → ||",
+            "snippet": "const status = (st) => (gaps ? gaps.filter((g) => g && g.status === st).length : undefined"
+          },
+          {
+            "line": 83,
+            "mutation": "|| → &&",
+            "snippet": "out.organKilled = all > 0 ? organs.reduce((n, f) => n + (Number(ow(f, 'killed')) || 0), 0)"
+          }
+        ],
+        "ignored": [],
+        "clean": false
+      }
+    },
+    {
+      "file": "tools/claims.mjs",
+      "at": "f1d8e70",
+      "tests": [
+        "test/claims.test.mjs"
+      ],
+      "witness": {
+        "total": 81,
+        "killed": 50,
+        "survived": 31,
+        "capped": false,
+        "survivors": [
+          {
+            "line": 129,
+            "mutation": ">= → >",
+            "snippet": "return { name, passed: r.status === 0 && n('pass') >= 1 && n('fail') === 0 };"
+          },
+          {
+            "line": 53,
+            "mutation": "> → >=",
+            "snippet": "const ran = ws.length > 0 && ws.every((x) => x !== null);"
+          },
+          {
+            "line": 78,
+            "mutation": "> → >=",
+            "snippet": "const killedAll = Number.isInteger(g.listed) && g.listed > 0 && g.killed === g.listed && g"
+          },
+          {
+            "line": 90,
+            "mutation": "> → >=",
+            "snippet": "held: BUYERS.every((b) => personas.has(b)) && gaps.length > 0 && gaps.every(ok),"
+          },
+          {
+            "line": 95,
+            "mutation": "=== → !==",
+            "snippet": "fixed: gaps.filter((g) => isObj(g) && g.status === 'fixed').length,"
+          },
+          {
+            "line": 96,
+            "mutation": "=== → !==",
+            "snippet": "needsSimon: gaps.filter((g) => isObj(g) && g.status === 'needs Simon').length,"
+          },
+          {
+            "line": 129,
+            "mutation": "=== → !==",
+            "snippet": "return { name, passed: r.status === 0 && n('pass') >= 1 && n('fail') === 0 };"
+          },
+          {
+            "line": 129,
+            "mutation": "=== → !==",
+            "snippet": "return { name, passed: r.status === 0 && n('pass') >= 1 && n('fail') === 0 };"
+          },
+          {
+            "line": 152,
+            "mutation": "=== → !==",
+            "snippet": "const matched = pairs.filter((p) => existsSync(join(root, p.path)) && sha(rd(p.path)) === "
+          },
+          {
+            "line": 154,
+            "mutation": "=== → !==",
+            "snippet": "m.C1 = { held: c1.passed && pairs.length === 3 && matched === pairs.length, where: 'test/p"
+          },
+          {
+            "line": 154,
+            "mutation": "=== → !==",
+            "snippet": "m.C1 = { held: c1.passed && pairs.length === 3 && matched === pairs.length, where: 'test/p"
+          },
+          {
+            "line": 157,
+            "mutation": "=== → !==",
+            "snippet": "m.T1 = { held: t1.status === 0, where: 'receipts/trace.json', evidence: { rederived: t1.st"
+          },
+          {
+            "line": 157,
+            "mutation": "=== → !==",
+            "snippet": "m.T1 = { held: t1.status === 0, where: 'receipts/trace.json', evidence: { rederived: t1.st"
+          },
+          {
+            "line": 159,
+            "mutation": "=== → !==",
+            "snippet": "m.P1 = { held: p1.status === 0, where: 'tools/page-check.mjs', evidence: { passed: p1.stat"
+          },
+          {
+            "line": 159,
+            "mutation": "=== → !==",
+            "snippet": "m.P1 = { held: p1.status === 0, where: 'tools/page-check.mjs', evidence: { passed: p1.stat"
+          },
+          {
+            "line": 173,
+            "mutation": "=== → !==",
+            "snippet": "const isMain = (() => { try { return pathToFileURL(realpathSync(process.argv[1])).href ==="
+          },
+          {
+            "line": 187,
+            "mutation": "=== → !==",
+            "snippet": "for (const c of r.claims) console.error(`  ${c.id} ${c.held === null ? 'recorded' : c.held"
+          },
+          {
+            "line": 182,
+            "mutation": "!== → ===",
+            "snippet": "if (committed !== out) { console.error('receipts/claims.json does not re-derive:\\n' + out)"
+          },
+          {
+            "line": 52,
+            "mutation": "&& → ||",
+            "snippet": "const ws = organs.map((o) => (isObj(o) && isObj(o.witness) ? o.witness : null));"
+          },
+          {
+            "line": 95,
+            "mutation": "&& → ||",
+            "snippet": "fixed: gaps.filter((g) => isObj(g) && g.status === 'fixed').length,"
+          },
+          {
+            "line": 96,
+            "mutation": "&& → ||",
+            "snippet": "needsSimon: gaps.filter((g) => isObj(g) && g.status === 'needs Simon').length,"
+          },
+          {
+            "line": 129,
+            "mutation": "&& → ||",
+            "snippet": "return { name, passed: r.status === 0 && n('pass') >= 1 && n('fail') === 0 };"
+          },
+          {
+            "line": 129,
+            "mutation": "&& → ||",
+            "snippet": "return { name, passed: r.status === 0 && n('pass') >= 1 && n('fail') === 0 };"
+          },
+          {
+            "line": 144,
+            "mutation": "&& → ||",
+            "snippet": "const g0 = isObj(witness.g0) && isObj(witness.g0.witness) ? witness.g0.witness : {};"
+          },
+          {
+            "line": 152,
+            "mutation": "&& → ||",
+            "snippet": "const matched = pairs.filter((p) => existsSync(join(root, p.path)) && sha(rd(p.path)) === "
+          },
+          {
+            "line": 154,
+            "mutation": "&& → ||",
+            "snippet": "m.C1 = { held: c1.passed && pairs.length === 3 && matched === pairs.length, where: 'test/p"
+          },
+          {
+            "line": 154,
+            "mutation": "&& → ||",
+            "snippet": "m.C1 = { held: c1.passed && pairs.length === 3 && matched === pairs.length, where: 'test/p"
+          },
+          {
+            "line": 125,
+            "mutation": "|| → &&",
+            "snippet": "const name = (rd(file).toString().match(new RegExp(`test\\\\('(${id} ·[^']*)'`)) || [])[1];"
+          },
+          {
+            "line": 128,
+            "mutation": "|| → &&",
+            "snippet": "const n = (k) => Number((r.stdout.match(new RegExp(`^# ${k} (\\\\d+)$`, 'm')) || [])[1]);"
+          },
+          {
+            "line": 150,
+            "mutation": "|| → &&",
+            "snippet": "const c1Row = (sealText.split(/\\r?\\n/).find((l) => /^\\|\\s*C1\\s*\\|/.test(l))) || '';"
+          },
+          {
+            "line": 173,
+            "mutation": "return false → return true",
+            "snippet": "const isMain = (() => { try { return pathToFileURL(realpathSync(process.argv[1])).href ==="
+          }
+        ],
+        "ignored": [],
+        "clean": false
+      }
+    },
+    {
+      "file": "tools/page-check.mjs",
+      "at": "f1d8e70",
+      "tests": [
+        "test/page.test.mjs"
+      ],
+      "witness": {
+        "total": 53,
+        "killed": 38,
+        "survived": 15,
+        "capped": false,
+        "survivors": [
+          {
+            "line": 79,
+            "mutation": "> → >=",
+            "snippet": "return out.filter((t) => t.length > 0);"
+          },
+          {
+            "line": 54,
+            "mutation": "< → <=",
+            "snippet": "const readQuoted = (q) => { let t = ''; i++; while (i < s.length && s[i] !== q) { if (s[i]"
+          },
+          {
+            "line": 57,
+            "mutation": "< → <=",
+            "snippet": "while (i < s.length && s[i] !== '`') {"
+          },
+          {
+            "line": 67,
+            "mutation": "< → <=",
+            "snippet": "while (i < s.length) {"
+          },
+          {
+            "line": 69,
+            "mutation": "< → <=",
+            "snippet": "if (c === '/' && d === '/') { while (i < s.length && s[i] !== '\\n') i++; continue; }"
+          },
+          {
+            "line": 34,
+            "mutation": "=== → !==",
+            "snippet": "if (e[0] === '#') { const n = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : pa"
+          },
+          {
+            "line": 34,
+            "mutation": "=== → !==",
+            "snippet": "if (e[0] === '#') { const n = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : pa"
+          },
+          {
+            "line": 127,
+            "mutation": "=== → !==",
+            "snippet": "const isMain = (() => { try { return pathToFileURL(realpathSync(process.argv[1])).href ==="
+          },
+          {
+            "line": 59,
+            "mutation": "&& → ||",
+            "snippet": "if (s[i] === '$' && s[i + 1] === '{') { out.push(t); t = ''; i += 2; skipCode('}'); contin"
+          },
+          {
+            "line": 74,
+            "mutation": "&& → ||",
+            "snippet": "if (c === '}') { if (depth === 0 && closer === '}') { i++; return; } depth--; }"
+          },
+          {
+            "line": 108,
+            "mutation": "&& → ||",
+            "snippet": "const local = [...String(html).matchAll(/\\b(?:href|src)=\"([^\"#:?]+)(?:[?#][^\"]*)?\"/g)].map"
+          },
+          {
+            "line": 34,
+            "mutation": "|| → &&",
+            "snippet": "if (e[0] === '#') { const n = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : pa"
+          },
+          {
+            "line": 99,
+            "mutation": "|| → &&",
+            "snippet": "if (re.test(text)) fails.push(`index.html prose: ${what} — ${(text.match(re) || [])[0]}`);"
+          },
+          {
+            "line": 127,
+            "mutation": "return false → return true",
+            "snippet": "const isMain = (() => { try { return pathToFileURL(realpathSync(process.argv[1])).href ==="
+          },
+          {
+            "line": 58,
+            "mutation": "+ 1 → - 1",
+            "snippet": "if (s[i] === '\\\\') { t += s[i + 1] ?? ''; i += 2; continue; }"
+          }
+        ],
+        "ignored": [],
+        "clean": false
+      }
+    }
+  ],
   "allClean": true,
   "reproduce": "see .github/workflows/ci.yml — CI runs witness on each organ, then node tools/gates.mjs --witness-dir <dir> --check"
 }

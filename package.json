@@ -12,7 +12,9 @@
     "test": "node --test test/test.mjs test/kernel.test.mjs test/io.test.mjs test/mintcase.test.mjs test/pins.test.mjs test/page.test.mjs test/claims.test.mjs",
     "gate": "node gate.mjs",
     "gen-golden": "node test/gen-golden.mjs",
-    "check": "npm test && npm run gate && node tools/measure.mjs --check && node tools/trace.mjs --check && node tools/page-check.mjs && node tools/claims.mjs --check"
+    "check": "npm test && npm run gate && node tools/measure.mjs --check && node tools/trace.mjs --check && node test/equivalence-1c.mjs && node tools/page-check.mjs && node tools/claims.mjs --check"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

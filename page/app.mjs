@@ -114,10 +114,16 @@ if (trace) {
 // ── blueprint: organs and claims, from the receipts ────────────────────────────────────────────
 if (witness) {
   const tb = $('organ-table').querySelector('tbody');
-  for (const o of witness.organs) {
+  // the organs (CLAIMS-1b G1), then this page's own modules (CLAIMS-1c G3)
+  for (const o of [...(Array.isArray(witness.organs) ? witness.organs : []), ...(Array.isArray(witness.kernels) ? witness.kernels : [])]) {
     const w = o.witness;
     const verdict = w ? el('span', { class: w.clean ? 'ok' : 'bad' }, w.killed + ' / ' + w.total + (w.clean ? ' · clean' : ' · ' + w.survived + ' survived')) : el('span', { class: 'mut' }, 'not run');
-    tb.append(el('tr', {}, el('td', {}, code(o.file)), el('td', {}, o.job), el('td', {}, ...o.tests.flatMap((t, i) => (i ? [el('br', {}), code(t)] : [code(t)]))), el('td', { class: 'num' }, verdict)));
+    // a baselined survivor is shown with its written reason, never hidden inside "clean"
+    const exempt = w && Array.isArray(w.ignored) && w.ignored.length
+      ? el('details', { class: 'sealed' }, el('summary', {}, w.ignored.length + (w.ignored.length === 1 ? ' survivor baselined' : ' survivors baselined') + ', with the reason'),
+        ...w.ignored.map((x) => el('p', { class: 'mut', style: 'text-align:left;white-space:normal' }, 'line ' + x.line + ' · ', code(x.mutation), ' — ' + x.reason)))
+      : '';
+    tb.append(el('tr', {}, el('td', {}, code(o.file)), el('td', {}, o.job, exempt), el('td', {}, ...o.tests.flatMap((t, i) => (i ? [el('br', {}), code(t)] : [code(t)]))), el('td', { class: 'num' }, verdict)));
   }
 }
 
@@ -142,12 +148,17 @@ const saidMore = {
   T1: (e) => ['', e.rederived ? 're-derived byte for byte' : 'does not re-derive'],
   P1: (e) => ['', e.passed ? 'the check passes' : 'the check fails'],
   W1: (e) => ['', `${e.gaps} gaps over ${e.rounds} rounds: ${e.fixed} fixed, ${e.needsSimon} need Simon, ${e.unanswered} unanswered`],
+  G3: (e) => ['', `${e.killed} of ${e.total} killed across ${e.files} modules, ${e.baselined} baselined`],
+  G4: (e) => [`${e.killed} of ${e.total} killed, ${e.survived} survived, across ${e.files} files`, ''],
+  V1: (e) => ['', `${e.compared} earlier verdicts compared, ${Array.isArray(e.changed) && e.changed.length ? 'changed: ' + e.changed.join(', ') : 'none changed'}`],
+  W2: (e) => ['', `round ${e.round}: ${e.walks} walks, ${e.gaps} gaps: ${e.fixed} fixed, ${e.needsSimon} need Simon, ${e.unanswered} unanswered`],
 };
 const meaning = {
   L1: 'secret shapes, first build', L2: 'secret shapes, now', L3: 'lines holding no secret pass untouched', L4: 'the first build’s own fuzz, now',
   F1: 'unproven claims are flagged', F2: 'lines that claim nothing are not', F3: 'what counts as proof', R1: 'a forged rollup', R2: 'a damaged feed',
   E1: 'no network, no processes', G0: 'witness on the first build', G1: 'witness on every organ', G2: 'the curated gate', C1: 'the cost case, byte for byte',
   T1: 'the traced run', P1: 'the page check', W1: 'the buyer walks',
+  G3: 'witness on this page’s own modules', G4: 'the same modules before', V1: 'every claim of every seal, verdicts kept', W2: 'the buyer walks, third round',
 };
 const measuredOf = (id) => { try { return step1b.claims.find((c) => c.id === id).measured || {}; } catch { return {}; } };
 const short = (s) => String(s ?? '').replace(/\b[0-9a-f]{64}\b/g, (h) => h.slice(0, 12) + '…');
@@ -156,7 +167,7 @@ if (claims && Array.isArray(claims.claims)) {
   for (const c of claims.claims) {
     const [a, b] = said[c.id] ? said[c.id](measuredOf(c.id)) : saidMore[c.id] ? saidMore[c.id](c.evidence || {}) : ['', ''];
     const v = c.held === null ? el('span', { class: 'mut' }, 'recorded') : el('span', { class: c.held ? 'ok' : 'bad' }, c.held ? 'held' : 'failed');
-    const head = el('td', {}, el('b', {}, c.id), ' ', meaning[c.id] || '', el('div', { class: 'mut sealed' }, short(c.claim)), c.where ? el('div', { class: 'mut sealed' }, 'verdict from ', code(c.where)) : '');
+    const head = el('td', {}, c.seal ? el('span', { class: 'mut' }, c.seal.replace(/\.md$/, '') + ' · ') : '', el('b', {}, c.id), ' ', meaning[c.id] || '', el('div', { class: 'mut sealed' }, short(c.claim)), c.where ? el('div', { class: 'mut sealed' }, 'verdict from ', code(c.where)) : '');
     tb.append(el('tr', {}, head, el('td', {}, short(c.bar)), el('td', {}, a || '—'), el('td', {}, b || '—'), el('td', {}, v)));
   }
 } else {

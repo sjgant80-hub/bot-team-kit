@@ -4,6 +4,7 @@
 // '—' for the facts it would have supplied, never a throw.
 //   receipts = { step1b: receipts/step1b.json, witness: receipts/witness.json, trace: receipts/trace.json,
 //                walks: data/persona-walks.json, claims: receipts/claims.json }
+// Witness gates this file on GitHub's runner with test/page.test.mjs (CLAIMS-1c G3).
 
 const pick = (o, path) => { try { return path.split('.').reduce((v, k) => (v == null ? undefined : v[k]), o); } catch { return undefined; } };
 const claim = (step1b, id) => { try { return step1b.claims.find((c) => c.id === id) || {}; } catch { return {}; } };
@@ -81,6 +82,19 @@ export function facts(receipts) {
   const all = organs.reduce((n, f) => n + (Number(ow(f, 'total')) || 0), 0);
   out.organMutants = all > 0 ? all : undefined;
   out.organKilled = all > 0 ? organs.reduce((n, f) => n + (Number(ow(f, 'killed')) || 0), 0) : undefined;
+  // the page's own modules (CLAIMS-1c G3) and the same modules before that fold (G4): a sum over a list that ran
+  const runs = (key) => { const l = pick(w, key); return Array.isArray(l) ? l.map((x) => pick(x, 'witness')).filter((x) => x && typeof x === 'object') : []; };
+  const sum = (list, k) => (list.length ? list.reduce((n, x) => n + (Number(x[k]) || 0), 0) : undefined);
+  const now = runs('kernels'), before = runs('g4');
+  out.pageFiles = now.length || undefined;
+  out.pageMutants = sum(now, 'total');
+  out.pageKilled = sum(now, 'killed');
+  out.pageBeforeMutants = sum(before, 'total');
+  out.pageBeforeKilled = sum(before, 'killed');
+  out.pageBeforeSurvived = sum(before, 'survived');
+  // every file witness gated on the runner: the organs and the page's modules
+  out.witnessMutants = out.organMutants === undefined ? undefined : all + (out.pageMutants || 0);
+  out.witnessKilled = out.organKilled === undefined ? undefined : out.organKilled + (out.pageKilled || 0);
   out.allClean = pick(w, 'allClean') === true ? 'clean' : pick(w, 'allClean') === false ? 'not clean' : undefined;
   return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, shown(v)]));
 }

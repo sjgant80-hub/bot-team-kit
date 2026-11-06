@@ -1,14 +1,19 @@
-// tools/claims.mjs — every claim CLAIMS-1b sealed, with its verdict, in one receipt the page reads (receipts/claims.json).
-// Nothing is measured anew here: each verdict is read from the receipt that measured it, or re-run from the check that
-// holds it, against the bar the seal states.
+// tools/claims.mjs — every claim every seal names (CLAIMS-1b.md, then CLAIMS-1c.md), with its verdict, in one receipt
+// the page reads (receipts/claims.json). Nothing is measured anew here: each verdict is read from the receipt that
+// measured it, or re-run from the check that holds it, against the bar its own seal states. The verdict logic is pure
+// and lives in tools/verdicts.mjs (witness-gated, CLAIMS-1c G3); this file reads, runs the named checks and writes.
+//   CLAIMS-1b
 //   L1–L4, F1–F3, R1, R2   receipts/step1b.json (tools/measure.mjs, re-derived in CI from the sealed batteries)
 //   G0, G1, G2             receipts/witness.json (tools/gates.mjs, re-derived in CI from CI's own witness run); G2's
 //                          "never shrink" is read against step 1's gate.mjs, from git
 //   E1, C1                 their named tests, run here; C1's three hashes are also recomputed against the seal's text
 //   T1, P1                 their CI checks (tools/trace.mjs --check, tools/page-check.mjs), run here
 //   W1                     data/persona-walks.json: every gap fixed on the page, or needing Simon with the decision
-// The bar shown for each claim is the seal's own text, read from the table in CLAIMS-1b.md. A sealed claim with no
-// measurer here is refused, never skipped.
+//   CLAIMS-1c
+//   G3, G4                 receipts/witness.json (the page's three pure modules now; the same files before the fold)
+//   V1                     this receipt: every CLAIMS-1b verdict compared with the receipt at the seal's base, from git
+//   W2                     data/persona-walks.json, round 3: every buyer walked and said what they checked
+// A sealed claim with no measurer here is refused, never skipped.
 //   node tools/claims.mjs           write receipts/claims.json
 //   node tools/claims.mjs --check   re-derive and compare byte for byte (CI, after every other check)
 import { readFileSync, writeFileSync, existsSync, realpathSync } from 'node:fs';
@@ -16,104 +21,20 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { sealTable, hashPairs, g1Verdict, g2Verdict, g3Verdict, g4Record, w1Verdict, roundVerdict, sameVerdicts, verdicts, summary } from './verdicts.mjs';
+
+export { BUYERS, sealTable, hashPairs, g1Verdict, g2Verdict, g3Verdict, g4Record, gateIds, w1Verdict, roundVerdict, sameVerdicts, verdicts, summary } from './verdicts.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(root, 'receipts', 'claims.json');
 const STEP1 = '4c20fd942289916e2a75dd443b83d32c13805c62';
-export const BUYERS = Object.freeze(['CFO', 'CTO / CISO', 'COO', 'Procurement']);
+// CLAIMS-1c's base: step 1b and its walks as pushed, before this fold
+const BASE_1C = 'f1d8e7038b7f0d05f922eb939550d932edb928b0';
+export const SEALS = Object.freeze(['CLAIMS-1b.md', 'CLAIMS-1c.md']);
 
 const sha = (b) => createHash('sha256').update(b).digest('hex');
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const list = (v) => (Array.isArray(v) ? v : []);
-const text = (v) => (typeof v === 'string' ? v.trim() : '');
-
-/** the seal's table: one { id, claim, bar } per row, in the seal's order, backticks dropped */
-export function sealTable(seal) {
-  const rows = [];
-  for (const line of String(seal ?? '').split(/\r?\n/)) {
-    const m = line.match(/^\|\s*([A-Z]\d+)\s*\|(.*)\|\s*$/);
-    if (!m) continue;
-    const cells = m[2].split(/\s\|\s/).map((c) => c.replace(/`/g, '').trim());
-    if (cells.length < 2) continue;
-    rows.push({ id: m[1], claim: cells.slice(0, -1).join(' | '), bar: cells[cells.length - 1] });
-  }
-  return rows;
-}
-
-/** C1: every `path` … `hash` pair the seal's C1 row names, and whether the file's bytes still hash to it */
-export function hashPairs(row) {
-  return [...String(row ?? '').matchAll(/`([\w./-]+\.(?:mjs|json))`(?:\s+sha256)?\s+`([0-9a-f]{64})`/g)].map((m) => ({ path: m[1], sha256: m[2] }));
-}
-
-/** G1: witness clean on every organ, at the pinned tag and cap, nothing capped, every baselined survivor with a reason */
-export function g1Verdict(witness) {
-  const w = isObj(witness) ? witness : {};
-  const organs = list(w.organs);
-  const ws = organs.map((o) => (isObj(o) && isObj(o.witness) ? o.witness : null));
-  const ran = ws.length > 0 && ws.every((x) => x !== null);
-  const baselined = ws.reduce((n, x) => n + (x ? list(x.ignored).length : 0), 0);
-  const reasoned = ws.every((x) => !x || list(x.ignored).every((i) => isObj(i) && text(i.reason).length > 0));
-  const pinned = isObj(w.witness) && w.witness.tag === 'v0.6' && w.witness.cap === 800;
-  const clean = ran && ws.every((x) => x.clean === true && x.capped === false && list(x.survivors).length === 0);
-  return {
-    held: ran && pinned && clean && reasoned,
-    evidence: {
-      organs: organs.length,
-      killed: ws.reduce((n, x) => n + (x && Number.isFinite(x.killed) ? x.killed : 0), 0),
-      total: ws.reduce((n, x) => n + (x && Number.isFinite(x.total) ? x.total : 0), 0),
-      baselined,
-      tag: isObj(w.witness) ? w.witness.tag : undefined,
-    },
-  };
-}
-
-/** the mutant ids a gate.mjs lists */
-export const gateIds = (src) => [...String(src ?? '').matchAll(/\{\s*id:\s*'([^']+)'/g)].map((m) => m[1]);
-
-/** G2: the curated gate is green, kills every mutant it lists, and still lists every mutant step 1's gate listed */
-export function g2Verdict(g2, step1Src, nowSrc) {
-  const g = isObj(g2) ? g2 : {};
-  const before = gateIds(step1Src), now = new Set(gateIds(nowSrc));
-  const kept = before.length > 0 && before.every((id) => now.has(id));
-  const killedAll = Number.isInteger(g.listed) && g.listed > 0 && g.killed === g.listed && g.listed === now.size;
-  return { held: g.green === true && killedAll && kept, evidence: { killed: g.killed, listed: g.listed, step1Listed: before.length, step1Kept: kept } };
-}
-
-/** W1: the four buyers walked; every gap is fixed (with the change) or needs Simon (with the decision) */
-export function w1Verdict(walks) {
-  const wk = list(isObj(walks) ? walks.walks : undefined).filter(isObj);
-  const gaps = wk.flatMap((w) => list(w.gaps));
-  const ok = (g) => isObj(g) && ((g.status === 'fixed' && text(g.change).length > 0) || (g.status === 'needs Simon' && text(g.decision).length > 0));
-  const personas = new Set(wk.map((w) => w.persona));
-  const rounds = new Set(wk.map((w) => (Number.isInteger(w.round) ? w.round : 1)));
-  return {
-    held: BUYERS.every((b) => personas.has(b)) && gaps.length > 0 && gaps.every(ok),
-    evidence: {
-      walks: wk.length,
-      rounds: rounds.size,
-      gaps: gaps.length,
-      fixed: gaps.filter((g) => isObj(g) && g.status === 'fixed').length,
-      needsSimon: gaps.filter((g) => isObj(g) && g.status === 'needs Simon').length,
-      unanswered: gaps.filter((g) => !ok(g)).length,
-    },
-  };
-}
-
-/** one verdict per sealed row; `m` holds the measurers' results by id. A row with no measurer is refused. */
-export function verdicts(rows, m) {
-  const missing = rows.filter((r) => !(r.id in m)).map((r) => r.id);
-  if (missing.length) throw new Error(`no measurer for sealed claim(s): ${missing.join(', ')}`);
-  return rows.map((r) => ({ id: r.id, claim: r.claim, bar: r.bar, held: m[r.id].held, where: m[r.id].where, evidence: m[r.id].evidence }));
-}
-
-export function summary(claims) {
-  return {
-    sealed: claims.length,
-    held: claims.filter((c) => c.held === true).length,
-    failed: claims.filter((c) => c.held === false).length,
-    recorded: claims.filter((c) => c.held === null).length,
-  };
-}
 
 // ---- the run ----------------------------------------------------------------------------------------------------
 function main() {
@@ -130,7 +51,7 @@ function main() {
   };
 
   const sealText = rd('CLAIMS-1b.md').toString();
-  const rows = sealTable(sealText);
+  const seals = SEALS.map((file) => { const t = rd(file).toString(); return { file, text: t, rows: sealTable(t) }; });
   const step1b = J('receipts/step1b.json');
   const witness = J('receipts/witness.json');
   const walks = J('data/persona-walks.json');
@@ -159,11 +80,22 @@ function main() {
   m.P1 = { held: p1.status === 0, where: 'tools/page-check.mjs', evidence: { passed: p1.status === 0 } };
   m.W1 = { ...w1Verdict(walks), where: 'data/persona-walks.json' };
 
-  const claims = verdicts(rows, m);
+  // CLAIMS-1c
+  m.G3 = { ...g3Verdict(witness), where: 'receipts/witness.json' };
+  m.G4 = { ...g4Record(witness), where: 'receipts/witness.json' };
+  m.W2 = { ...roundVerdict(walks, 3), where: 'data/persona-walks.json' };
+  // V1 is measured on the CLAIMS-1b verdicts this run gives, against the receipt at CLAIMS-1c's base, read from git
+  const before = JSON.parse(execFileSync('git', ['-C', root, 'show', `${BASE_1C}:receipts/claims.json`], { encoding: 'utf8' }));
+  m.V1 = { held: null, where: 'receipts/claims.json' };
+  const first = verdicts(seals[0].rows, m);
+  const v1 = sameVerdicts(before, first);
+  const everyRow = seals.every((x) => x.rows.length > 0);
+  m.V1 = { held: v1.held && everyRow, where: 'receipts/claims.json', evidence: { seals: seals.length, ...v1.evidence } };
+
+  const claims = seals.flatMap((x) => verdicts(x.rows, m).map((c) => ({ seal: x.file, ...c })));
   return {
-    receipt: 'bot-team-kit — every claim CLAIMS-1b sealed, with its verdict and where it is measured',
-    sealedIn: 'CLAIMS-1b.md',
-    sealSha256: sha(sealText),
+    receipt: 'bot-team-kit — every claim every seal names, with its verdict and where it is measured',
+    seals: seals.map((x) => ({ file: x.file, sha256: sha(x.text), claims: x.rows.length })),
     reproduce: 'node tools/claims.mjs --check (CI runs it after every other check)',
     claims,
     summary: summary(claims),

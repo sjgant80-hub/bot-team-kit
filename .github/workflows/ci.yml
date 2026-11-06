@@ -28,6 +28,29 @@ jobs:
           gate feed "test/io.test.mjs"
           gate rollup "test/io.test.mjs"
           gate mintcase "test/mintcase.test.mjs"
+      - name: witness v0.6 on the page's own modules (CLAIMS-1c G3) — clean or the job fails
+        run: |
+          kgate() {
+            node /tmp/witness6/witness.mjs mutate "$1" --timeout 30000 --cap 800 --test node --test $2 > "/tmp/w/$3.json" \
+              || { echo "::error::mutants survived in $1"; cat "/tmp/w/$3.json"; exit 1; }
+          }
+          kgate page/facts.mjs "test/page.test.mjs" facts
+          kgate tools/verdicts.mjs "test/claims.test.mjs" verdicts
+          kgate tools/page-rules.mjs "test/page.test.mjs" page-rules
+      - name: the one baselined survivor is checked, not argued — the exact mutant against the real rules, exhaustively
+        run: node test/equivalence-1c.mjs
+      - name: witness v0.6 on the same modules before CLAIMS-1c, with that commit's tests (G4) — recorded only
+        run: |
+          mkdir -p /tmp/before1c
+          git archive f1d8e7038b7f0d05f922eb939550d932edb928b0 | tar -x -C /tmp/before1c
+          cd /tmp/before1c
+          before() {
+            node /tmp/witness6/witness.mjs mutate "$1" --timeout 30000 --cap 800 --test node --test $2 > "/tmp/w/$3.json" || true
+            node -e "const r=require('/tmp/w/$3.json'); if (!(r.total > 0)) { console.error('G4 did not run on $1'); process.exit(1); } console.log('G4 recorded, $1:', r.killed, 'of', r.total, 'killed')"
+          }
+          before page/facts.mjs "test/page.test.mjs" before-facts
+          before tools/claims.mjs "test/claims.test.mjs" before-claims
+          before tools/page-check.mjs "test/page.test.mjs" before-page-check
       - name: witness v0.6 on the first build's kernel with the first build's tests (G0) — recorded only, survivors expected
         run: |
           mkdir -p /tmp/step1
@@ -43,7 +66,7 @@ jobs:
         run: node tools/trace.mjs --check
       - name: the page carries no typed-in number, no price or tier wording, the credits and every section (P1)
         run: node tools/page-check.mjs
-      - name: receipts/claims.json re-derives — every claim CLAIMS-1b seals, with its verdict against the seal's own bar
+      - name: receipts/claims.json re-derives — every claim CLAIMS-1b and CLAIMS-1c seal, each with its verdict against its own seal's bar
         run: node tools/claims.mjs --check
       - name: keep the witness outputs
         if: always()

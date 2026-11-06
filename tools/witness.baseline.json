@@ -1,0 +1,7 @@
+[
+  {
+    "mutation": "< → <=",
+    "snippet": "while (i < s.length) {",
+    "reason": "Equivalent, and checked rather than argued. This is the outer loop bound of the code walker inside jsStrings (tools/page-rules.mjs). The mutant takes one extra iteration, entered only when i === s.length; there s[i] and s[i + 1] are both undefined, which matches none of the branch guards (each compares against a single character: '/', a quote, a backtick, '{' or '}'), so the body falls through to i++ and the loop ends. Nothing is pushed and depth is not read again. Where i jumps by more than one (a comment, a string, a template, a ${...} part) it lands on s.length — the no-op iteration above — or past it, which fails both bounds alike. test/equivalence-1c.mjs builds this exact mutant and compares it with the real rules on every string of up to six characters drawn from every character the walker branches on, plus 100,000 random longer strings and non-string inputs; CI runs it on every push, and a single difference fails the job."
+  }
+]

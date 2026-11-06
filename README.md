@@ -20,22 +20,24 @@ node gate.mjs                               # the kit's curated mutation gate (i
 node tools/measure.mjs --check              # the battery claims re-derive from the sealed batteries
 node tools/trace.mjs --check                # the traced run on the page re-derives
 node tools/page-check.mjs                   # the page carries no typed-in number, no price, the credits, every section
-node tools/claims.mjs --check               # every claim the seal names has its verdict, against the seal's own bar
+node tools/claims.mjs --check               # every claim every seal names has its verdict, against its own seal's bar
 ```
 CI (`.github/workflows/ci.yml`) runs all of these on GitHub's runner on every push, plus
-[witness](https://github.com/sjgant80-hub/witness) **v0.6** (pinned tag) on every organ — clean or the job fails — and
-on the first build's kernel for the before-picture. The counts live in the receipts, not in this README:
+[witness](https://github.com/sjgant80-hub/witness) **v0.6** (pinned tag) on every organ and on the page's own three
+modules (the numbers, the verdicts, the page check) — clean or the job fails — and on the first build's kernel and the
+page modules as they were before CLAIMS-1c, for the before-pictures. The counts live in the receipts, not in this README:
 
 | receipt | what it holds |
 |---|---|
-| [`receipts/claims.json`](receipts/claims.json) | every claim CLAIMS-1b seals, with its verdict against the seal's own bar and where it is measured |
+| [`receipts/claims.json`](receipts/claims.json) | every claim CLAIMS-1b and CLAIMS-1c seal, each with its verdict against its own seal's bar and where it is measured |
 | [`receipts/step1b.json`](receipts/step1b.json) | CLAIMS-1b's L, F and R claims, measured once against the first build (read from git) and the code now |
-| [`receipts/witness.json`](receipts/witness.json) | tests, the curated gate (G2), witness on every organ (G1) and on the first build's kernel (G0) |
+| [`receipts/witness.json`](receipts/witness.json) | tests, the curated gate (G2), witness on every organ (G1), on the first build's kernel (G0), on the page's own modules (G3) and on them before CLAIMS-1c (G4) |
 | [`receipts/trace.json`](receipts/trace.json) | one real run through `append()` and `buildRollup()`, fixed clock (T1) |
 | [`receipts/build-step1.json`](receipts/build-step1.json) | the first build's receipt, kept as it was |
 
 The claims were sealed before the code that measures them: [`CLAIMS-1b.md`](CLAIMS-1b.md) and
-[`data/probe-1b.json`](data/probe-1b.json) (never edited after the seal; a failed claim stays failed).
+[`data/probe-1b.json`](data/probe-1b.json), then [`CLAIMS-1c.md`](CLAIMS-1c.md) for gating the page's own modules
+(never edited after the seal; a failed claim stays failed).
 
 ## What's in the kit
 | file | does |
@@ -48,8 +50,8 @@ The claims were sealed before the code that measures them: [`CLAIMS-1b.md`](CLAI
 | `gate.mjs` | the curated mutation gate over `test/checks.mjs` (the first build's suite, unchanged) and `test/checks-1b.mjs`. |
 | `test/` | the first build's suite, the kernel suite, the I/O suite (temp folders only), the cost case, the pins, the page check. |
 | `skills/feed-write/SKILL.md` | the skill a bot loads to write the feed; pinned to the kernel's SHA-256 (`test/pins.test.mjs`). |
-| `page/` · `index.html` | the live page; every number on it comes from the receipts (`page/facts.mjs`) or a kernel. |
-| `tools/` | measure, trace, gates, page-check and claims — each with a `--check` mode CI runs. |
+| `page/` · `index.html` | the live page; every number on it comes from the receipts (`page/facts.mjs`, witness-gated) or a kernel. |
+| `tools/` | measure, trace, gates, page-check and claims — each with a `--check` mode CI runs; the pure logic of the last two is `tools/page-rules.mjs` and `tools/verdicts.mjs`, witness-gated. |
 
 ## The feed line
 ```json
